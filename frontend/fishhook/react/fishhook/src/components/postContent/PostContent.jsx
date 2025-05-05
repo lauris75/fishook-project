@@ -7,12 +7,33 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState } from "react";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns'; // Install if not already
+import { api } from "../../context/AuthContext"; // Use the same import path as in Posts
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
-  
+  const [liked, setLiked] = useState(post.isLikedByCurrentUser);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+
+  // Format the date
   const formattedDate = post.date ? formatDistanceToNow(new Date(post.date), { addSuffix: true }) : "unknown time";
+  
+  const handleLike = async () => {
+    try {
+      if (liked) {
+        // Unlike the post
+        await api.delete(`/likes/${post.id}`);
+        setLikeCount(prev => prev - 1);
+      } else {
+        // Like the post
+        await api.post('/likes', { postId: post.id });
+        setLikeCount(prev => prev + 1);
+      }
+      setLiked(!liked);
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
+  };
   
   return (
     <div className="post">
@@ -37,9 +58,9 @@ const Post = ({ post }) => {
           {post.photoURL && <img src={post.photoURL} alt="" />}
         </div>
         <div className="info">
-          <div className="item">
-            {post.isLikedByCurrentUser ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
-            {post.likeCount} {post.likeCount === 1 ? 'Like' : 'Likes'}
+          <div className="item" onClick={handleLike}>
+            {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
+            {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
