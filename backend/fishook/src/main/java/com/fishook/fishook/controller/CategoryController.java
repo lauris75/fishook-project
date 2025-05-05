@@ -20,25 +20,21 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createCategory(@RequestBody Category category) {
         return new ResponseEntity<>(categoryService.createCategory(category), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<Category> fetchCategories() {
         return categoryService.getAllCategories().stream().map(p -> new Category(p.getId(), p.getName())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{categoryId}")
     public Optional<Category> fetchCategoryById(@PathVariable Long categoryId) {
         return categoryService.getCategoryById(categoryId);
     }
 
-    @CrossOrigin
     @DeleteMapping("/{categoryId}")
     public ResponseEntity deleteUser(@PathVariable Long categoryId) {
         return new ResponseEntity(categoryService.deleteCategory(categoryId), HttpStatus.OK);

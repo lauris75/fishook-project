@@ -19,25 +19,21 @@ public class PostCommentController {
     @Autowired
     private PostCommentService postCommentService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createPostComment(@RequestBody PostComment postComment) {
         return new ResponseEntity(postCommentService.createPostComment(postComment), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<PostComment> getAllComments() {
         return postCommentService.getAllComments().stream().map(p -> new PostComment(p.getId(), p.getUserId(), p.getPostId(), p.getContent(), p.getDate())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{postId}")
     public List<PostComment> getAllPostCommentsByPostId(@PathVariable Long postId) {
         return postCommentService.getAllPostCommentsByPostId(postId).stream().map(p -> new PostComment(p.getId(), p.getUserId(), p.getPostId(), p.getContent(), p.getDate())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @DeleteMapping("/{postCommentId}")
     public ResponseEntity deletePostComment(@PathVariable Long postCommentId) {
         return new ResponseEntity(postCommentService.deletePostComment(postCommentId), HttpStatus.OK);

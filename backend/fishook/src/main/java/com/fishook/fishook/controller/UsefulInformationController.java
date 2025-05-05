@@ -20,25 +20,21 @@ public class UsefulInformationController {
     @Autowired
     private UsefulInformationService usefulInformationService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createUsefulInformation(@RequestBody UsefulInformation usefulInformation) {
         return new ResponseEntity(usefulInformationService.createUsefulInformation(usefulInformation), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<UsefulInformation> getAllUsefulInformation() {
         return usefulInformationService.getAllUsefulInformation().stream().map(p -> new UsefulInformation(p.getId(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{usefulInformationId}")
     public Optional<UsefulInformation> getUsefulInformationById(@PathVariable Long usefulInformationId) {
         return usefulInformationService.getUsefulInformationById(usefulInformationId);
     }
 
-    @CrossOrigin
     @DeleteMapping("/{usefulInformationId}")
     public ResponseEntity deleteUsefulInformation(@PathVariable Long usefulInformationId) {
         return new ResponseEntity(usefulInformationService.deleteUsefulInformation(usefulInformationId), HttpStatus.OK);

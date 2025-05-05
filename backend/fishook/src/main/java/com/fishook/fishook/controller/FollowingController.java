@@ -19,25 +19,21 @@ public class FollowingController {
     @Autowired
     private FollowingService followingService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createFollowing(@RequestBody Following following) {
         return new ResponseEntity(followingService.createFollowing(following), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<Following> getAllFollowing() {
         return followingService.getAllFollowing().stream().map(p -> new Following(p.getId(), p.getFollower(), p.getFollowee())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{followerId}")
     public List<Following> getAllFollowingByFollower(@PathVariable Long followerId) {
         return followingService.findAllByFollowee(followerId).stream().map(p -> new Following(p.getId(), p.getFollower(), p.getFollowee())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @DeleteMapping("/{followingId}")
     public ResponseEntity deleteFollowing(@PathVariable Long followingId) {
         return new ResponseEntity(followingService.deleteFollowing(followingId), HttpStatus.OK);

@@ -20,25 +20,21 @@ public class FishController {
     @Autowired
     private FishService fishService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createFish(@RequestBody Fish fish) {
         return new ResponseEntity(fishService.createFish(fish), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<Fish> getAllFish() {
         return fishService.getAllFish().stream().map(p -> new Fish(p.getId(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{fishId}")
     public Optional<Fish> getFishById(@PathVariable Long fishId) {
         return fishService.getFishbyId(fishId);
     }
 
-    @CrossOrigin
     @DeleteMapping("/{fishId}")
     public ResponseEntity deleteFishById(@PathVariable Long fishId) {
         return new ResponseEntity(fishService.deleteFishById(fishId), HttpStatus.OK);

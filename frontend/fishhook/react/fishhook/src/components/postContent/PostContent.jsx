@@ -6,16 +6,49 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
-import { useState } from "react";
-import { formatDistanceToNow } from 'date-fns'; // Install if not already
-import { api } from "../../context/AuthContext"; // Use the same import path as in Posts
+import { useState, useEffect } from "react";
+import { formatDistanceToNow } from 'date-fns';
+import { api } from "../../context/AuthContext";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
+  
+  // Sort comments by date when initializing state
+  const sortCommentsByDate = (commentsArray) => {
+    return [...commentsArray].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA - dateB; // For oldest first
+    });
+  };
+  
+  // Initialize with sorted comments
+  const [comments, setComments] = useState(
+    sortCommentsByDate(post.comments || [])
+  );
+  
+  const [commentCount, setCommentCount] = useState(post.commentCount || 0);
+  
+  // Re-sort comments if post.comments changes
+  useEffect(() => {
+    if (post.comments) {
+      setComments(sortCommentsByDate(post.comments));
+    }
+  }, [post.comments]);
+  
+  const handleCommentAdded = (newComment) => {
+    // Add the new comment and sort all comments by date
+    setComments(prevComments => {
+      const updatedComments = [newComment, ...prevComments];
+      return sortCommentsByDate(updatedComments);
+    });
+    
+    // Increment the comment count
+    setCommentCount(prevCount => prevCount + 1);
+  };
 
-  // Format the date
   const formattedDate = post.date ? formatDistanceToNow(new Date(post.date), { addSuffix: true }) : "unknown time";
   
   const handleLike = async () => {
@@ -64,14 +97,18 @@ const Post = ({ post }) => {
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
-            {post.commentCount} {post.commentCount === 1 ? 'Comment' : 'Comments'}
+            {commentCount} {commentCount === 1 ? 'Comment' : 'Comments'}
           </div>
           <div className="item">
             <ShareOutlinedIcon />
             Share
           </div>
         </div>
-        {commentOpen && <Comments comments={post.comments} postId={post.id} />}
+        {commentOpen && <Comments 
+        comments={comments} 
+        postId={post.id} 
+        onCommentAdded={handleCommentAdded} 
+      />}
       </div>
     </div>
   );

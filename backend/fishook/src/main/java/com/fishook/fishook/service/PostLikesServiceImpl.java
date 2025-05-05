@@ -4,6 +4,7 @@ import com.fishook.fishook.entity.PostLikes;
 import com.fishook.fishook.repository.PostLikesRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,6 +18,7 @@ public class PostLikesServiceImpl implements PostLikesService {
 
     @Override
     public PostLikes createPostLike(PostLikes postLikes) {
+        postLikes.setDate(new Date());
         return postLikesRepository.save(postLikes);
     }
 

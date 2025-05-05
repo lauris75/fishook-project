@@ -19,25 +19,21 @@ public class MarketPostController {
     @Autowired
     private MarketPostService marketPostService;
 
-    @CrossOrigin
     @PostMapping
     public ResponseEntity createMarketPost(@RequestBody MarketPost marketPost) {
         return new ResponseEntity(marketPostService.createMarketPost(marketPost), HttpStatus.CREATED);
     }
 
-    @CrossOrigin
     @GetMapping
     public List<MarketPost> getAllMarketPosts() {
         return marketPostService.getAllMarketPosts().stream().map(p -> new MarketPost(p.getId(), p.getUserId(), p.getPrice(), p.getDate(), p.getPhotoURL(), p.getContent(), p.getCategoryId())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @GetMapping("/{categoryId}")
     public List<MarketPost> getMarketPostsByCategory(@PathVariable Long categoryId) {
         return marketPostService.getAllMarketpostsByCategoryId(categoryId).stream().map(p -> new MarketPost(p.getId(), p.getUserId(), p.getPrice(), p.getDate(), p.getPhotoURL(), p.getContent(), p.getCategoryId())).collect(Collectors.toList());
     }
 
-    @CrossOrigin
     @DeleteMapping("/{marketPostId}")
     public ResponseEntity deleteMarketPost(@PathVariable Long marketPostId) {
         return new ResponseEntity(marketPostService.deleteMarketPost(marketPostId), HttpStatus.OK);

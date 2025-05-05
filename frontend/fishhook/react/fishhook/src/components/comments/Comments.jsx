@@ -4,7 +4,7 @@ import "./Comments.scss";
 import { formatDistanceToNow } from 'date-fns';
 import { api } from "../../context/AuthContext";
 
-const Comments = ({ comments = [], postId }) => {
+const Comments = ({ comments = [], postId, onCommentAdded }) => {
   const { currentUser } = useContext(AuthContext);
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,18 +17,32 @@ const Comments = ({ comments = [], postId }) => {
     setIsSubmitting(true);
     
     try {
-      await api.post('/comments', {
-        postId,
+      const response = await api.post('/postComment', {
+        postId: postId,
+        userId: currentUser.id,
         content: commentText,
-        userId: currentUser.id, // Assuming your auth context provides this
+        date: new Date()
       });
       
-      setCommentText("");
+      // Create a new comment object
+      const newComment = {
+        id: response.data.id,
+        userId: currentUser.id,
+        content: commentText,
+        date: new Date(),
+        user: {
+          name: currentUser.name,
+          lastname: currentUser.surname || currentUser.lastname,
+          profilePicture: currentUser.profilePicture
+        }
+      };
       
-      // Here you could implement a strategy to refresh comments
-      // Option 1: Refetch all comments for this post
-      // Option 2: Add the new comment to the local state
-      // Option 3: Use a global state management like Redux or Context
+      // Call the callback from parent with the new comment
+      if (onCommentAdded) {
+        onCommentAdded(newComment);
+      }
+      
+      setCommentText("");
       
     } catch (error) {
       console.error("Error posting comment:", error);
