@@ -3,7 +3,7 @@ import "./Posts.scss";
 import { useState, useEffect } from "react";
 import { api } from "../../context/AuthContext";
 
-const Posts = () => {
+const Posts = ({ userId }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +11,16 @@ const Posts = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await api.get('/userPost');
+        let response;
+        
+        if (userId) {
+          // If userId is provided, fetch posts for that specific user
+          response = await api.get(`/userPost/userPosts/${userId}`);
+        } else {
+          // Otherwise, fetch all posts (feed)
+          response = await api.get('/userPost');
+        }
+        
         setPosts(response.data);
         setLoading(false);
       } catch (err) {
@@ -21,10 +30,11 @@ const Posts = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [userId]);
 
   if (loading) return <div className="posts">Loading posts...</div>;
   if (error) return <div className="posts">Error: {error}</div>;
+  if (posts.length === 0) return <div className="posts">No posts found</div>;
 
   return (
     <div className="posts">
