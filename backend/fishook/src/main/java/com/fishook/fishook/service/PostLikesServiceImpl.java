@@ -33,8 +33,9 @@ public class PostLikesServiceImpl implements PostLikesService {
     }
 
     @Override
-    public String deletePostLike(Long postLikeId) {
-        postLikesRepository.deleteById(postLikeId);
+    public String deletePostLike(Long postId, Long userId) {
+        PostLikes postLikes = postLikesRepository.findByPostIdAndUserId(postId, userId);
+        postLikesRepository.deleteById(postLikes.getId());
         return "Deleted";
     }
 

@@ -1,5 +1,6 @@
 package com.fishook.fishook.controller;
 
+import com.fishook.fishook.config.SecurityService;
 import com.fishook.fishook.entity.PostLikes;
 import com.fishook.fishook.service.PostLikesService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,10 +18,15 @@ import java.util.stream.Collectors;
 public class PostLikesController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private PostLikesService postLikesService;
 
     @PostMapping
     public ResponseEntity createPostLike(@RequestBody PostLikes postLike) {
+        Long currentUserId = securityService.getCurrentUserId();
+        postLike.setUserId(currentUserId);
         return new ResponseEntity(postLikesService.createPostLike(postLike), HttpStatus.CREATED);
     }
 
@@ -34,8 +40,9 @@ public class PostLikesController {
         return postLikesService.getAllPostlikesByPostId(postId).stream().map(p -> new PostLikes(p.getId(), p.getUserId(), p.getPostId(), p.getDate())).collect(Collectors.toList());
     }
 
-    @DeleteMapping("/{postLikeId}")
-    public ResponseEntity deletePostLike(@PathVariable Long postLikeId) {
-        return new ResponseEntity(postLikesService.deletePostLike(postLikeId), HttpStatus.OK);
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePostLike(@PathVariable Long postId) {
+        Long currentUserId = securityService.getCurrentUserId();
+        return new ResponseEntity(postLikesService.deletePostLike(postId, currentUserId), HttpStatus.OK);
     }
 }

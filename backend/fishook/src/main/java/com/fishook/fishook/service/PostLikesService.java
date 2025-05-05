@@ -12,7 +12,7 @@ public interface PostLikesService {
 
     List<PostLikes> getAllPostlikesByPostId(Long postId);
 
-    String deletePostLike(Long postLikeId);
+    String deletePostLike(Long postId, Long userId);
 
     Integer getCountByPostId(Long postId);
 

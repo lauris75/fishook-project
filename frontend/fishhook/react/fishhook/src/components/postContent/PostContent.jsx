@@ -15,23 +15,20 @@ const Post = ({ post }) => {
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   
-  // Sort comments by date when initializing state
   const sortCommentsByDate = (commentsArray) => {
     return [...commentsArray].sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateA - dateB; // For oldest first
+      return dateA - dateB;
     });
   };
   
-  // Initialize with sorted comments
   const [comments, setComments] = useState(
     sortCommentsByDate(post.comments || [])
   );
   
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   
-  // Re-sort comments if post.comments changes
   useEffect(() => {
     if (post.comments) {
       setComments(sortCommentsByDate(post.comments));
@@ -39,13 +36,11 @@ const Post = ({ post }) => {
   }, [post.comments]);
   
   const handleCommentAdded = (newComment) => {
-    // Add the new comment and sort all comments by date
     setComments(prevComments => {
       const updatedComments = [newComment, ...prevComments];
       return sortCommentsByDate(updatedComments);
     });
     
-    // Increment the comment count
     setCommentCount(prevCount => prevCount + 1);
   };
 
@@ -54,12 +49,10 @@ const Post = ({ post }) => {
   const handleLike = async () => {
     try {
       if (liked) {
-        // Unlike the post
-        await api.delete(`/likes/${post.id}`);
+        await api.delete(`/postLikes/${post.id}`);
         setLikeCount(prev => prev - 1);
       } else {
-        // Like the post
-        await api.post('/likes', { postId: post.id });
+        await api.post('/postLikes', { postId: post.id });
         setLikeCount(prev => prev + 1);
       }
       setLiked(!liked);
