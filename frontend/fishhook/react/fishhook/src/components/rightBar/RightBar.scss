@@ -1,0 +1,81 @@
+.rightBar{
+    flex: 3;
+    position: sticky;
+    top: 100px;
+    height: calc(100vh - 100px);
+    padding-left: 20px;
+    overflow: scroll;
+
+    &::-webkit-scrollbar{
+        display: none;
+    }
+
+    .container{
+        .friends{
+            position: sticky;
+            top: 0;
+            height: calc(50vh - 100px);
+            overflow: scroll;
+
+            &::-webkit-scrollbar{
+                display: none;
+            }
+
+            p{
+                font-size: 30px;
+                margin: 10px;
+            }
+            .friend{
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding-top: 20px;
+                img{
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+
+                span{
+                    margin-left: 6px;
+                    font-size: 20px;
+                }
+
+            }
+        }
+
+        .groups{
+            position: sticky;
+            top: calc(50vh - 100px);
+            height: calc(60vh - 100px);
+            overflow: scroll;
+
+            &::-webkit-scrollbar{
+                display: none;
+            }
+
+            p{
+                font-size: 30px;
+                margin: 10px;
+            }
+            .group{
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding-top: 20px;
+                img{
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+
+                span{
+                    margin-left: 6px;
+                    font-size: 20px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,75 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.swn
+*.orig
+
+# --- Git ---
+.git/
+.gitmodules
+
+# --- Environment Files ---
+.env
+.env.*.local
+
+# --- Node (React frontend) ---
+node_modules/
+dist/
+build/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+*.eslintcache
+*.tsbuildinfo
+
+# --- Spring Boot (Java backend) ---
+# Compiled class files
+*.class
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+**/build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.csettings/
+.settings/
+bin/
+tmp/
+
+# VS Code
+.vscode/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# --- Optional: OS-specific ---
+*.DS_Store
+Thumbs.db

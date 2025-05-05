@@ -1,0 +1,111 @@
+.register{
+    height: 100vh;
+    background-color: #5F9EA0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .card{
+        width: 50%;
+        min-height: 600px;
+        display: flex;
+        background: url("https://images.unsplash.com/photo-1594644173124-74328f4b76e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80") no-repeat bottom center;
+        background-size: cover;
+        box-sizing: border-box;
+        box-shadow: inset -400px 0 150px 0 #FFF;
+        border-radius: 15px;
+        overflow: hidden;
+        .right{
+            padding: 20px;
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            color: black;
+            justify-content: center;
+            h1{
+                font-size: 40px;
+                color: #333333;
+            }
+            form{
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                opacity: 0.8;
+                input{
+                    border: none;
+                    border-bottom: 1px black solid;
+                    padding: 20px 10px;
+                    font-size: 16px;
+                }
+                select{
+                    border: none;
+                    border-bottom: 1px black solid;
+                    padding: 20px 10px;
+                    font-size: 16px;
+                    border-radius: 5px;
+                }
+                button{
+                    width: 50%;
+                    padding: 10px;
+                    border: none;
+                    background-color: #5F9EA0;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 17px;
+                    cursor: pointer;
+                    border-radius: 3px;
+                }
+            }
+        }
+        .left{
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            color: white;
+            p{
+                padding-top: 20px;
+                padding-right: 100px;
+                font-size: 19px;
+                font-weight: bold;
+            }
+            span{
+                padding-top: 220px;
+                padding-bottom: 10px;
+            }
+            div{
+                text-align: left;
+                button{
+                width:150px;
+                padding: 10px;
+                border: none;
+                cursor: pointer;
+                border-radius: 3px;
+                }
+            }
+            
+        }
+    }
+}
+
+.error-container {
+    margin: 12px 0;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: rgba(255, 0, 0, 0.05);
+    border: 1px solid rgba(255, 0, 0, 0.2);
+  
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  
+    .error-code {
+      color: #888;
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 4px;
+    }
+  }
