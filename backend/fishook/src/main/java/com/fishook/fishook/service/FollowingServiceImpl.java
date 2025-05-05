@@ -11,19 +11,25 @@ public class FollowingServiceImpl implements FollowingService {
 
     private final FollowingRepository followingRepository;
 
-
     public FollowingServiceImpl(FollowingRepository followingRepository) {
         this.followingRepository = followingRepository;
     }
 
     @Override
     public Following createFollowing(Following following) {
-        return followingRepository.save(following);
+        Following existingFollow = findByFolloweeAndFollower(
+                following.getFollowee(),
+                following.getFollower()
+        );
+        if (existingFollow == null) {
+            return followingRepository.save(following);
+        }
+        return existingFollow;
     }
 
     @Override
-    public List<Following> getAllFollowing() {
-        return followingRepository.findAll();
+    public List<Following> getAllFollowing(Long currentUserId) {
+        return followingRepository.findAllByFollower(currentUserId);
     }
 
     @Override
@@ -32,13 +38,9 @@ public class FollowingServiceImpl implements FollowingService {
     }
 
     @Override
-    public List<Following> findAllByFollowee(Long followee) {
-        return followingRepository.findAllByFollowee(followee);
-    }
-
-    @Override
-    public String deleteFollowing(Long followingId) {
-        followingRepository.deleteById(followingId);
+    public String deleteFollowing(Long followeeId, Long currentUserId) {
+        Following following = followingRepository.findByFolloweeAndFollower(followeeId, currentUserId);
+        followingRepository.deleteById(following.getId());
         return "Deleted";
     }
 }

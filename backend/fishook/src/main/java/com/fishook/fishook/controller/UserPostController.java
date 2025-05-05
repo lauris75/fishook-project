@@ -33,14 +33,13 @@ public class UserPostController {
     @GetMapping
     public List<PostDto> getAllUserFullPosts() {
         Long currentUserId = securityService.getCurrentUserId();
-
-        // Use your new service method that returns PostDto objects with all the data
         return userPostService.getAllUserFullPosts(currentUserId);
     }
 
     @GetMapping("userPosts/{userId}")
-    public List<UserPost> getAllUserPostsPerUserId(@PathVariable Long userId) {
-        return userPostService.getAllUserPostsByUserId(userId).stream().map(p -> new UserPost(p.getId(), p.getUserId(), p.getGroupId(), p.getContent(), p.getPhotoURL(), p.getDate())).collect(Collectors.toList());
+    public List<PostDto> getAllUserPostsPerUserId(@PathVariable Long userId) {
+        Long currentUserId = securityService.getCurrentUserId();
+        return userPostService.getAllUserPostsByUserId(userId, currentUserId);
     }
 
     @GetMapping("groupPosts/{groupId}")

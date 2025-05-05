@@ -48,8 +48,9 @@ public class UserPostServiceImpl implements UserPostService {
     }
 
     @Override
-    public List<UserPost> getAllUserPostsByUserId(Long userId) {
-        return userPostRepository.getAllByUserIdAndGroupIdOrderByDateDesc(userId, null);
+    public List<PostDto> getAllUserPostsByUserId(Long userId, Long currentUserId) {
+        List<UserPost> userPosts = userPostRepository.getAllByUserIdAndGroupIdOrderByDateDesc(userId, null);
+        return enrichPostsWithAssociatedData(userPosts, currentUserId);
     }
 
     @Override

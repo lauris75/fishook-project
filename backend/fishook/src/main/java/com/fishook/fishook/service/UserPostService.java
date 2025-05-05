@@ -12,7 +12,7 @@ public interface UserPostService {
 
     List<PostDto> getAllUserFullPosts(Long userId);
 
-    List<UserPost> getAllUserPostsByUserId(Long userId);
+    List<PostDto> getAllUserPostsByUserId(Long userId, Long currentUserId);
 
     List<UserPost> getAllUserPostsForGroup(Long groupId);
 

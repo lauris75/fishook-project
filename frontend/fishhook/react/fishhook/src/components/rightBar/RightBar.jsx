@@ -1,63 +1,127 @@
 import "./RightBar.scss"
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const RightBar = () => {
+  const { currentUser, api } = useContext(AuthContext);
+  const [following, setFollowing] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [loadingFollowing, setLoadingFollowing] = useState(true);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch following data
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      try {
+        // Get users that the current user is following
+        const followingResponse = await api.get(`/following`);
+        
+        // For each following relationship, fetch the user data
+        const followersData = await Promise.all(
+          followingResponse.data.map(async (follow) => {
+            // Get user data for each followee
+            const userResponse = await api.get(`/user/${follow.followee}`);
+            return userResponse.data;
+          })
+        );
+        
+        setFollowing(followersData);
+        setLoadingFollowing(false);
+      } catch (err) {
+        console.error("Error fetching following:", err);
+        setError("Failed to load following");
+        setLoadingFollowing(false);
+      }
+    };
+
+    if (currentUser?.id) {
+      fetchFollowing();
+    }
+  }, [currentUser, api]);
+
+  // Fetch group data
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        // First get all group members for current user
+        const groupMembersResponse = await api.get('/groupMember');
+        const userGroups = groupMembersResponse.data.filter(
+          member => member.userId === currentUser.id
+        );
+        
+        // For each group membership, fetch the group data
+        const groupsData = await Promise.all(
+          userGroups.map(async (membership) => {
+            const groupResponse = await api.get(`/group/${membership.groupId}`);
+            return groupResponse.data;
+          })
+        );
+        
+        setGroups(groupsData);
+        setLoadingGroups(false);
+      } catch (err) {
+        console.error("Error fetching groups:", err);
+        setError("Failed to load groups");
+        setLoadingGroups(false);
+      }
+    };
+
+    if (currentUser?.id) {
+      fetchGroups();
+    }
+  }, [currentUser, api]);
+
   return (
     <div className="rightBar">
       <div className="container">
         <div className="friends">
           <p>Following</p>
-          <div className="friend">
-            <img
-              src="https://images.unsplash.com/photo-1609818902866-a1076a14484a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
-              alt=""
-            />
-            <span>Ben Smith</span>
-          </div>
-          <div className="friend">
-            <img
-              src="https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=1600"
-              alt=""
-            />
-            <span>Jane Doe</span>
-          </div>
-          <div className="friend">
-            <img
-              src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=934&q=80"
-              alt=""
-            />
-            <span>John Doe</span>
-          </div>
+          {loadingFollowing ? (
+            <div>Loading following...</div>
+          ) : error ? (
+            <div>{error}</div>
+          ) : following.length === 0 ? (
+            <div>Not following anyone yet</div>
+          ) : (
+            following.map((user) => (
+              <Link 
+                to={`/profile/${user.id}`} 
+                style={{ textDecoration: "none", color: "inherit" }}
+                key={user.id}
+              >
+                <div className="friend">
+                  <img src={user.profilePicture} alt="" />
+                  <span>{user.name} {user.lastname}</span>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
+        
         <div className="groups">
           <p>Your groups</p>
-          <div className="group">
-            <img
-              src="https://images.unsplash.com/photo-1529230117010-b6c436154f25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
-              alt=""
-            />
-            <span>FawAway</span>
-          </div>
-          <div className="group">
-            <img
-              src="https://images.unsplash.com/photo-1551131618-3f0a5cf594b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80"
-              alt=""
-            />
-            <span>Group catchers</span>
-          </div>
-          <div className="group">
-            <img
-              src="https://images.unsplash.com/photo-1592929043000-fbea34bc8ad5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-              alt=""
-            />
-            <span>Baits</span>
-          </div>
-          <div className="group">
-            <img
-              src="https://images.unsplash.com/photo-1537872384762-e785271d14f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80"
-              alt=""
-            />
-            <span>Caribbean Sea</span>
-          </div>
+          {loadingGroups ? (
+            <div>Loading groups...</div>
+          ) : error ? (
+            <div>{error}</div>
+          ) : groups.length === 0 ? (
+            <div>You don't belong to any group yet</div>
+          ) : (
+            groups.map((group) => (
+              <Link 
+                to={`/group/${group.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+                key={group.id}
+              >
+                <div className="group">
+                  <img src={group.photoURL} alt="" />
+                  <span>{group.summary}</span>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </div>

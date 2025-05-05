@@ -30,11 +30,15 @@ const Profile = () => {
         const response = await api.get(`/user/${id}`);
         setProfile(response.data);
         
-        // Check if the current user is following this profile
-        const followingResponse = await api.get(`/following/${id}`);
-        setIsFollowing(followingResponse.data.some(follow => 
-          follow.follower === currentUser.id && follow.followee === parseInt(id)
-        ));
+        // Use the new check endpoint to determine follow status
+        try {
+          const followResponse = await api.get(`/following/check/${id}`);
+          setIsFollowing(followResponse.data);
+        } catch (followErr) {
+          console.error("Error checking follow status:", followErr);
+          // Default to not following if there's an error
+          setIsFollowing(false);
+        }
         
         setLoading(false);
       } catch (err) {
@@ -50,13 +54,13 @@ const Profile = () => {
     try {
       if (isFollowing) {
         // Find the following relationship and delete it
-        const followingResponse = await api.get(`/following/${id}`);
+        const followingResponse = await api.get(`/following`);
         const relationship = followingResponse.data.find(follow => 
           follow.follower === currentUser.id && follow.followee === parseInt(id)
         );
         
         if (relationship) {
-          await api.delete(`/following/${relationship.id}`);
+          await api.delete(`/following/${parseInt(id)}`);
         }
       } else {
         // Create new following relationship

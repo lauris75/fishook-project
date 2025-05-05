@@ -6,6 +6,7 @@ import WaterOutlinedIcon from '@mui/icons-material/WaterOutlined';
 import FishIcon from "../../assets/fish_icon.png";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { Link } from "react-router-dom"; // Add this import
 
 const NavBar = () => {
 
@@ -15,11 +16,20 @@ const NavBar = () => {
     <div className="navBar">
       <div className="container">
         <div className="menu">
-          <img
-            src={currentUser.profilePicture}
-            alt=""
-          />
-          <span>{ currentUser.name }</span>
+          {/* Wrap the profile image and name in a Link component */}
+          <Link to={`/profile/${currentUser.id}`} style={{ 
+            textDecoration: "none", 
+            color: "inherit",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px"
+          }}>
+            <img
+              src={currentUser.profilePicture}
+              alt=""
+            />
+            <span>{currentUser.name}</span>
+          </Link>
         </div>
         <div className="item">
           <Diversity3OutlinedIcon style={{ fontSize: 60 }}/>

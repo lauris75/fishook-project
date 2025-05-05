@@ -8,11 +8,9 @@ public interface FollowingService {
 
     Following createFollowing(Following following);
 
-    List<Following> getAllFollowing();
+    List<Following> getAllFollowing(Long currentUserId);
 
     Following findByFolloweeAndFollower(Long followee, Long follower);
 
-    List<Following> findAllByFollowee(Long followee);
-
-    String deleteFollowing(Long followingId);
+    String deleteFollowing(Long followeeId, Long currentUserId);
 }
