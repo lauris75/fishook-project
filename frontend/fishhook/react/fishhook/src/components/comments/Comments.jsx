@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import "./Comments.scss";
 import { formatDistanceToNow } from 'date-fns';
 import { api } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Comments = ({ comments = [], postId, onCommentAdded }) => {
   const { currentUser } = useContext(AuthContext);
@@ -60,6 +61,7 @@ const Comments = ({ comments = [], postId, onCommentAdded }) => {
           placeholder="write a comment" 
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
         />
         <button onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Sending..." : "Send"}
@@ -67,9 +69,16 @@ const Comments = ({ comments = [], postId, onCommentAdded }) => {
       </div>
       {comments.map((comment) => (
         <div className="comment" key={comment.id}>
-          <img src={comment.user?.profilePicture} alt="" />
+          <Link to={`/profile/${comment.userId}`}>
+            <img src={comment.user?.profilePicture} alt="" />
+          </Link>
           <div className="info">
-            <span>{comment.user?.name} {comment.user?.lastname}</span>
+            <Link 
+              to={`/profile/${comment.userId}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <span>{comment.user?.name} {comment.user?.lastname}</span>
+            </Link>
             <p>{comment.content}</p>
           </div>
           <span className="date">

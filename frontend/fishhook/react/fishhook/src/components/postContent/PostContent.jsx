@@ -73,7 +73,9 @@ const Post = ({ post }) => {
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img src={post.user?.profilePicture} alt="" />
+            <Link to={`/profile/${post.userId}`}>
+              <img src={post.user?.profilePicture} alt="" />
+            </Link>
             <div className="details">
               <Link
                 to={`/profile/${post.userId}`}
@@ -105,10 +107,10 @@ const Post = ({ post }) => {
           </div>
         </div>
         {commentOpen && <Comments 
-        comments={comments} 
-        postId={post.id} 
-        onCommentAdded={handleCommentAdded} 
-      />}
+          comments={comments} 
+          postId={post.id} 
+          onCommentAdded={handleCommentAdded} 
+        />}
       </div>
     </div>
   );
