@@ -92,6 +92,10 @@ const Group = () => {
                 </div>
               )}
             </div>
+            {/* Group description would go here */}
+            <div className="description">
+              {group.summary || "No description available for this group."}
+            </div>
           </div>
           <div className="action">
             {isOwner ? (
@@ -107,7 +111,6 @@ const Group = () => {
       
       <h2 className="postsTitle">Group Posts</h2>
       <div className="posts">
-        {/* Using the updated Posts component that now accepts groupId */}
         <Posts groupId={parseInt(id)} />
       </div>
     </div>
