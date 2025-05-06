@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import "./PostForm.scss";
 import { AuthContext } from "../../context/AuthContext";
 
-const PostForm = ({ onPostCreated }) => {
+const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
   const { currentUser, api } = useContext(AuthContext);
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
@@ -36,7 +36,8 @@ const PostForm = ({ onPostCreated }) => {
         userId: currentUser.id,
         content: content,
         photoURL: imageUrl || null, // For now, just use the local URL
-        date: new Date()
+        date: new Date(),
+        groupId: groupId || null
       };
       
       const response = await api.post('/userPost', postData);
@@ -58,6 +59,11 @@ const PostForm = ({ onPostCreated }) => {
       setIsSubmitting(false);
     }
   };
+
+  // Don't render the form if we're not on the user's own profile
+  if (!isOwnProfile) {
+    return null;
+  }
 
   return (
     <div className="post-form">

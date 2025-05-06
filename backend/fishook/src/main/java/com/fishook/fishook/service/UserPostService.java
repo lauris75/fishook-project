@@ -14,7 +14,7 @@ public interface UserPostService {
 
     List<PostDto> getAllUserPostsByUserId(Long userId, Long currentUserId);
 
-    List<UserPost> getAllUserPostsForGroup(Long groupId);
+    List<PostDto> getAllUserPostsForGroup(Long groupId, Long currentUserId);
 
     String deleteUserPost(Long userPostId);
 

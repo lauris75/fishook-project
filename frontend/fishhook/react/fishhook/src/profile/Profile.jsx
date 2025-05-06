@@ -13,7 +13,9 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   
-  const isOwnProfile = id ? parseInt(id) === currentUser.id : true;
+  // Check if we're viewing our own profile
+  const userId = id ? parseInt(id) : currentUser.id;
+  const isOwnProfile = userId === currentUser.id;
   
   useEffect(() => {
     const fetchProfile = async () => {

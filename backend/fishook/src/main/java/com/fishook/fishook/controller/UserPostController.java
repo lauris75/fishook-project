@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("userPost")
@@ -61,8 +60,9 @@ public class UserPostController {
     }
 
     @GetMapping("groupPosts/{groupId}")
-    public List<UserPost> getAllUserPostPerGroupId(@PathVariable Long groupId) {
-        return userPostService.getAllUserPostsForGroup(groupId).stream().map(p -> new UserPost(p.getId(), p.getUserId(), p.getGroupId(), p.getContent(), p.getPhotoURL(), p.getDate())).collect(Collectors.toList());
+    public List<PostDto> getAllUserPostPerGroupId(@PathVariable Long groupId) {
+        Long currentUserId = securityService.getCurrentUserId();
+        return userPostService.getAllUserPostsForGroup(groupId, currentUserId);
     }
 
     @DeleteMapping("/{userPostId}")
