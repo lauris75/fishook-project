@@ -1,7 +1,7 @@
 import Post from "../postContent/PostContent.jsx";
 import PostForm from "../postForm/PostForm.jsx";
 import "./Posts.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback  } from "react";
 import { api } from "../../context/AuthContext";
 
 const Posts = ({ userId, groupId }) => {
@@ -9,7 +9,7 @@ const Posts = ({ userId, groupId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       let endpoint = '/userPost';
       
@@ -30,11 +30,11 @@ const Posts = ({ userId, groupId }) => {
       setError(err.message || "Failed to fetch posts");
       setLoading(false);
     }
-  };
+  }, [userId, groupId]);
 
   useEffect(() => {
     fetchPosts();
-  }, [userId, groupId]);
+  }, [fetchPosts]);
 
   const handlePostCreated = (newPost) => {
     // Add the new post to the top of the posts list
