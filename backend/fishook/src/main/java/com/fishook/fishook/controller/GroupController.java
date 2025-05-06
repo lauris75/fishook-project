@@ -1,5 +1,6 @@
 package com.fishook.fishook.controller;
 
+import com.fishook.fishook.config.SecurityService;
 import com.fishook.fishook.entity.Group;
 import com.fishook.fishook.service.GroupService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,9 @@ import java.util.stream.Collectors;
 public class GroupController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private GroupService groupService;
 
     @PostMapping
@@ -27,14 +31,14 @@ public class GroupController {
 
     @GetMapping
     public List<Group> getAllGroups() {
-        return groupService.getAllGroups().stream().map(p -> new Group(p.getId(), p.getOwnerId(), p.getSummary(), p.getPhotoURL())).collect(Collectors.toList());
+        return groupService.getAllGroups().stream().map(p -> new Group(p.getId(), p.getOwnerId(), p.getGroupName(), p.getSummary(), p.getPhotoURL())).collect(Collectors.toList());
     }
 
-    /*@CrossOrigin
     @GetMapping("/myGroups")
     public List<Group> getAllMyGroups() {
-        return groupService.getGroupsByOwnerId(new Long(1));
-    }*/
+        Long currentUserId = securityService.getCurrentUserId();
+        return groupService.getGroupsByOwnerId(currentUserId);
+    }
 
     @GetMapping("/{groupId}")
     public Optional<Group> getGroupById(@PathVariable Long groupId) {

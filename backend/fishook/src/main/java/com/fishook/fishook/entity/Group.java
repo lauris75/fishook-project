@@ -21,6 +21,9 @@ public class Group {
     @Column(name = "ownerId", nullable = false)
     private Long ownerId;
 
+    @Column(name = "groupName", length = 30, nullable = false)
+    private String groupName;
+
     @Column(name = "summary", columnDefinition = "TEXT", nullable = false)
     private String summary;
 

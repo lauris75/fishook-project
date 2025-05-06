@@ -27,6 +27,9 @@ public class Lake {
     @Column(name = "photoURL", columnDefinition = "TEXT", nullable = false)
     private String photoURL;
 
-    @Column(name = "coordinates", length = 30, nullable = false)
-    private String coordinates;
+    @Column(name = "latitude", length = 30, nullable = false)
+    private String latitude;
+
+    @Column(name = "longitude", length = 30, nullable = false)
+    private String longitude;
 }

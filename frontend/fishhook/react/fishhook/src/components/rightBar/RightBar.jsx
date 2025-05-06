@@ -11,17 +11,13 @@ const RightBar = () => {
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch following data
   useEffect(() => {
     const fetchFollowing = async () => {
       try {
-        // Get users that the current user is following
         const followingResponse = await api.get(`/following`);
         
-        // For each following relationship, fetch the user data
         const followersData = await Promise.all(
           followingResponse.data.map(async (follow) => {
-            // Get user data for each followee
             const userResponse = await api.get(`/user/${follow.followee}`);
             return userResponse.data;
           })
@@ -41,17 +37,14 @@ const RightBar = () => {
     }
   }, [currentUser, api]);
 
-  // Fetch group data
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        // First get all group members for current user
         const groupMembersResponse = await api.get('/groupMember');
         const userGroups = groupMembersResponse.data.filter(
           member => member.userId === currentUser.id
         );
         
-        // For each group membership, fetch the group data
         const groupsData = await Promise.all(
           userGroups.map(async (membership) => {
             const groupResponse = await api.get(`/group/${membership.groupId}`);
@@ -117,7 +110,7 @@ const RightBar = () => {
               >
                 <div className="group">
                   <img src={group.photoURL} alt="" />
-                  <span>{group.summary}</span>
+                  <span>{group.groupName}</span>
                 </div>
               </Link>
             ))

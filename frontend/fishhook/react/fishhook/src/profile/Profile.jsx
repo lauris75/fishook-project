@@ -13,30 +13,25 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   
-  // Determine if this is the current user's profile
   const isOwnProfile = id ? parseInt(id) === currentUser.id : true;
   
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // If no ID provided or it matches current user, use current user data
         if (isOwnProfile) {
           setProfile(currentUser);
           setLoading(false);
           return;
         }
         
-        // Otherwise, fetch the user profile by ID
         const response = await api.get(`/user/${id}`);
         setProfile(response.data);
         
-        // Use the new check endpoint to determine follow status
         try {
           const followResponse = await api.get(`/following/check/${id}`);
           setIsFollowing(followResponse.data);
         } catch (followErr) {
           console.error("Error checking follow status:", followErr);
-          // Default to not following if there's an error
           setIsFollowing(false);
         }
         
@@ -53,7 +48,6 @@ const Profile = () => {
   const handleFollow = async () => {
     try {
       if (isFollowing) {
-        // Find the following relationship and delete it
         const followingResponse = await api.get(`/following`);
         const relationship = followingResponse.data.find(follow => 
           follow.follower === currentUser.id && follow.followee === parseInt(id)
@@ -63,7 +57,6 @@ const Profile = () => {
           await api.delete(`/following/${parseInt(id)}`);
         }
       } else {
-        // Create new following relationship
         await api.post('/following', {
           follower: currentUser.id,
           followee: parseInt(id)
@@ -108,7 +101,6 @@ const Profile = () => {
         </div>
       </div>
       <div className="posts">
-        {/* Pass the user ID to the Posts component to fetch only this user's posts */}
         <Posts userId={profile.id} />
       </div>
     </div>

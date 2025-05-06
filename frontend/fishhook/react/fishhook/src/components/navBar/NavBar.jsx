@@ -16,7 +16,6 @@ const NavBar = () => {
     <div className="navBar">
       <div className="container">
         <div className="menu">
-          {/* Wrap the profile image and name in a Link component */}
           <Link to={`/profile/${currentUser.id}`} style={{ 
             textDecoration: "none", 
             color: "inherit",

@@ -14,10 +14,8 @@ const Posts = ({ userId }) => {
         let response;
         
         if (userId) {
-          // If userId is provided, fetch posts for that specific user
           response = await api.get(`/userPost/userPosts/${userId}`);
         } else {
-          // Otherwise, fetch all posts (feed)
           response = await api.get('/userPost');
         }
         
