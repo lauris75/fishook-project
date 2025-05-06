@@ -3,7 +3,7 @@ import "./Posts.scss";
 import { useState, useEffect } from "react";
 import { api } from "../../context/AuthContext";
 
-const Posts = ({ userId }) => {
+const Posts = ({ userId, groupId }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,6 +15,8 @@ const Posts = ({ userId }) => {
         
         if (userId) {
           response = await api.get(`/userPost/userPosts/${userId}`);
+        } else if (groupId) {
+          response = await api.get(`/userPost/groupPosts/${groupId}`);
         } else {
           response = await api.get('/userPost');
         }
@@ -28,7 +30,7 @@ const Posts = ({ userId }) => {
     };
 
     fetchPosts();
-  }, [userId]);
+  }, [userId, groupId]);
 
   if (loading) return <div className="posts">Loading posts...</div>;
   if (error) return <div className="posts">Error: {error}</div>;
