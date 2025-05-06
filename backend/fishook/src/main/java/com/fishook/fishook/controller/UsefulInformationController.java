@@ -27,7 +27,7 @@ public class UsefulInformationController {
 
     @GetMapping
     public List<UsefulInformation> getAllUsefulInformation() {
-        return usefulInformationService.getAllUsefulInformation().stream().map(p -> new UsefulInformation(p.getId(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
+        return usefulInformationService.getAllUsefulInformation().stream().map(p -> new UsefulInformation(p.getId(), p.getName(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
     }
 
     @GetMapping("/{usefulInformationId}")

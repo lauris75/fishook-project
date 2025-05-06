@@ -18,6 +18,9 @@ public class UsefulInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", columnDefinition = "TEXT", nullable = false)
+    private String name;
+
     @Column(name = "summary", columnDefinition = "TEXT", nullable = false)
     private String summary;
 

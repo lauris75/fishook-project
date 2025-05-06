@@ -27,7 +27,7 @@ public class FishController {
 
     @GetMapping
     public List<Fish> getAllFish() {
-        return fishService.getAllFish().stream().map(p -> new Fish(p.getId(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
+        return fishService.getAllFish().stream().map(p -> new Fish(p.getId(), p.getName(), p.getSummary(), p.getDescription(), p.getPhotoURL())).collect(Collectors.toList());
     }
 
     @GetMapping("/{fishId}")

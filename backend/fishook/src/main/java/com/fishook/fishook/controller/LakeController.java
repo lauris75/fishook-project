@@ -27,7 +27,7 @@ public class LakeController {
 
     @GetMapping
     public List<Lake> getAllLakes() {
-        return lakeService.getAllLakes().stream().map(p -> new Lake(p.getId(), p.getSummary(), p.getDescription(), p.getPhotoURL(), p.getLatitude(), p.getLongitude())).collect(Collectors.toList());
+        return lakeService.getAllLakes().stream().map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(), p.getPhotoURL(), p.getLatitude(), p.getLongitude())).collect(Collectors.toList());
     }
 
     @GetMapping("/{lakeId}")

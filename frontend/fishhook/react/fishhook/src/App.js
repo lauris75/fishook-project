@@ -1,3 +1,4 @@
+// src/App.js
 import './App.css';
 import Login from './login/Login.jsx';
 import Register from './register/Register.jsx';
@@ -6,6 +7,9 @@ import Profile from './profile/Profile.jsx';
 import Group from './group/Group.jsx';
 import Marketplace from './marketplace/Marketplace.jsx';
 import Chat from './chat/Chat.jsx';
+import Fish from './fish/Fish.jsx';
+import Lake from './lake/Lake.jsx';
+import UsefulInfo from './usefulInfo/UsefulInfo.jsx';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -70,6 +74,31 @@ function App() {
         {
           path:"/chat",
           element:<Chat/>
+        },
+        // New routes
+        {
+          path:"/fish",
+          element:<Fish/>
+        },
+        {
+          path:"/fish/:id",
+          element:<Fish/>
+        },
+        {
+          path:"/lake",
+          element:<Lake/>
+        },
+        {
+          path:"/lake/:id",
+          element:<Lake/>
+        },
+        {
+          path:"/usefulinfo",
+          element:<UsefulInfo/>
+        },
+        {
+          path:"/usefulinfo/:id",
+          element:<UsefulInfo/>
         }
       ]
     },
