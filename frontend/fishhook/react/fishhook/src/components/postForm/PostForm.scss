@@ -1,132 +1,106 @@
 .post-form {
-    -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-    border-radius: 20px;
-    background-color: white;
-    padding: 20px;
-    margin-bottom: 30px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 15px -10px rgba(0, 0, 0, 0.3);
   
-    .user-info {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      
-      img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 10px;
-      }
-      
-      span {
-        font-weight: bold;
-      }
+  .user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
     }
     
-    .content-area {
+    .name {
+      font-weight: 500;
+    }
+  }
+  
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    resize: none;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    font-family: inherit;
+    
+    &:focus {
+      outline: none;
+    }
+  }
+  
+  .image-preview {
+    position: relative;
+    margin-bottom: 15px;
+    
+    img {
       width: 100%;
-      margin-bottom: 15px;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .upload-buttons {
+      display: flex;
+      gap: 10px;
       
-      textarea {
-        width: 100%;
-        min-height: 100px;
-        padding: 15px;
-        border: none;
-        resize: none;
-        border-radius: 10px;
-        background-color: #f0f2f5;
-        font-size: 16px;
+      .image-upload {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        color: #5F9EA0;
         
-        &:focus {
-          outline: none;
+        input {
+          display: none;
         }
-      }
-      
-      .image-preview {
-        position: relative;
-        margin-top: 15px;
-        
-        img {
-          width: 100%;
-          max-height: 300px;
-          object-fit: contain;
-          border-radius: 10px;
-        }
-        
-        .remove-btn {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background-color: rgba(0, 0, 0, 0.5);
-          color: white;
-          font-size: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: none;
-          cursor: pointer;
-          
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-          }
-        }
-      }
-      
-      .error-message {
-        color: #d32f2f;
-        margin-top: 10px;
-        font-size: 14px;
       }
     }
     
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #e0e0e0;
-      padding-top: 15px;
+    .submit-button {
+      background-color: #5F9EA0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: bold;
       
-      .options {
-        display: flex;
-        gap: 15px;
-        
-        .upload-btn {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          padding: 8px 15px;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background-color 0.2s;
-          
-          &:hover {
-            background-color: #f0f2f5;
-          }
-        }
-      }
-      
-      .post-btn {
-        background-color: #5F9EA0;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 8px 20px;
-        font-weight: bold;
-        cursor: pointer;
-        
-        &:disabled {
-          background-color: #cccccc;
-          cursor: not-allowed;
-        }
-        
-        &:not(:disabled):hover {
-          background-color: #4f8688;
-        }
+      &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
       }
     }
   }
+}
