@@ -1,6 +1,9 @@
 import { useState, useContext } from "react";
 import "./PostForm.scss";
 import { AuthContext } from "../../context/AuthContext";
+import { storage } from "../../firebase/firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
   const { currentUser, api } = useContext(AuthContext);
@@ -8,6 +11,7 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
@@ -30,12 +34,54 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
     setIsSubmitting(true);
     
     try {
-      // Create form data if you need to upload an image
-      // Otherwise, just send a JSON object
+      let finalImageUrl = null;
+      
+      // Upload image to Firebase if there is one
+      if (image) {
+        const storageRef = ref(storage, `posts/${currentUser.id}/${uuidv4()}`);
+        
+        // Create the file metadata
+        const metadata = {
+          contentType: image.type,
+        };
+        
+        // Upload file and metadata
+        const uploadTask = uploadBytesResumable(storageRef, image, metadata);
+        
+        // Listen for state changes, errors, and completion
+        await new Promise((resolve, reject) => {
+          uploadTask.on(
+            'state_changed', 
+            (snapshot) => {
+              // Update progress
+              const progress = Math.round(
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              );
+              setUploadProgress(progress);
+            },
+            (error) => {
+              console.error("Upload error:", error);
+              reject(error);
+            },
+            async () => {
+              // Upload completed, get download URL
+              try {
+                finalImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                resolve();
+              } catch (err) {
+                console.error("Error getting download URL:", err);
+                reject(err);
+              }
+            }
+          );
+        });
+      }
+      
+      // Create post data
       const postData = {
         userId: currentUser.id,
         content: content,
-        photoURL: imageUrl || null, // For now, just use the local URL
+        photoURL: finalImageUrl, // Use the Firebase Storage URL
         date: new Date(),
         groupId: groupId || null
       };
@@ -47,6 +93,7 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
         setContent("");
         setImage(null);
         setImageUrl("");
+        setUploadProgress(0);
         
         // Notify parent component that a new post was created
         if (onPostCreated) {
@@ -97,6 +144,16 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
             >
               ×
             </button>
+          </div>
+        )}
+        
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div className="upload-progress">
+            <div 
+              className="progress-bar" 
+              style={{ width: `${uploadProgress}%` }}
+            ></div>
+            <span>{uploadProgress}%</span>
           </div>
         )}
         
