@@ -17,15 +17,12 @@ const Group = () => {
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        // Fetch group details
         const groupResponse = await api.get(`/group/${id}`);
         setGroup(groupResponse.data);
 
-        // Fetch group owner details
         const ownerResponse = await api.get(`/user/${groupResponse.data.ownerId}`);
         setOwner(ownerResponse.data);
 
-        // Check if current user is a member
         const membersResponse = await api.get(`/groupMember/${id}`);
         setIsMember(membersResponse.data.some(member => member.userId === currentUser.id));
         
@@ -42,7 +39,6 @@ const Group = () => {
   const handleJoinLeave = async () => {
     try {
       if (isMember) {
-        // Find the membership record to delete
         const membersResponse = await api.get(`/groupMember/${id}`);
         const membership = membersResponse.data.find(member => member.userId === currentUser.id);
         if (membership) {
@@ -50,7 +46,6 @@ const Group = () => {
           setIsMember(false);
         }
       } else {
-        // Create new membership
         await api.post('/groupMember', {
           groupId: parseInt(id),
           userId: currentUser.id
@@ -92,7 +87,6 @@ const Group = () => {
                 </div>
               )}
             </div>
-            {/* Group description would go here */}
             <div className="description">
               {group.summary || "No description available for this group."}
             </div>
