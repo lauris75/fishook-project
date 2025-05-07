@@ -1,87 +1,117 @@
 .lake-page {
-    padding: 20px 30px;
+  padding: 20px 30px;
+  
+  &.list-view {
+    h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #333;
+    }
     
-    &.list-view {
-      h1 {
-        font-size: 32px;
-        margin-bottom: 12px;
-        color: #333;
-      }
+    .page-description {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .no-results {
+      background-color: white;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
       
-      .page-description {
-        font-size: 16px;
+      p {
+        font-size: 18px;
         color: #666;
-        margin-bottom: 30px;
+        margin-bottom: 15px;
       }
       
-      .lake-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
+      button {
+        background-color: #5F9EA0;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
         
-        .lake-card {
-          background-color: white;
-          border-radius: 10px;
+        &:hover {
+          background-color: darken(#5F9EA0, 10%);
+        }
+      }
+    }
+    
+    .lake-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      
+      .lake-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .lake-image {
+          height: 180px;
+          width: 100%;
           overflow: hidden;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-          cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
           
-          &:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-          }
-          
-          .lake-image {
-            height: 180px;
+          img {
             width: 100%;
-            overflow: hidden;
-            
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              transition: transform 0.3s ease;
-            }
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+        }
+        
+        .lake-info {
+          padding: 15px;
+          
+          h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #5F9EA0;
           }
           
-          .lake-info {
-            padding: 15px;
+          p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 10px;
+          }
+          
+          .lake-coords {
+            font-size: 12px;
+            color: #888;
+            font-family: monospace;
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 5px;
             
-            h3 {
-              font-size: 18px;
-              margin-bottom: 8px;
-              color: #5F9EA0;
-            }
-            
-            p {
-              font-size: 14px;
-              color: #555;
-              line-height: 1.5;
-              margin-bottom: 10px;
-            }
-            
-            .lake-coords {
-              font-size: 12px;
-              color: #888;
-              font-family: monospace;
-              display: flex;
-              justify-content: flex-start;
-              flex-wrap: wrap;
-              gap: 5px;
-              
-              span {
-                white-space: nowrap;
-              }
+            span {
+              white-space: nowrap;
             }
           }
         }
       }
     }
-    
-    &.single-view {
-      padding: 20px 0;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
   }
+  
+  &.single-view {
+    padding: 20px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
