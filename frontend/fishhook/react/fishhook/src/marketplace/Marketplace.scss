@@ -1,0 +1,55 @@
+.marketplace {
+    padding: 20px 30px;
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+    
+    .marketplace-description {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .filter-container {
+      margin: 25px 0;
+    }
+    
+    .no-posts {
+      background-color: white;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      
+      p {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 15px;
+      }
+      
+      button {
+        background-color: #5F9EA0;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background-color: darken(#5F9EA0, 10%);
+        }
+      }
+    }
+    
+    .market-posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+  }
