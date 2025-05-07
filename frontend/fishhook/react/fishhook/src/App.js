@@ -5,6 +5,7 @@ import Register from './register/Register.jsx';
 import Home from './home/Home.jsx';
 import Profile from './profile/Profile.jsx';
 import Group from './group/Group.jsx';
+import Groups from './group/Groups.jsx'; // Import the new Groups component
 import Marketplace from './marketplace/Marketplace.jsx';
 import Chat from './chat/Chat.jsx';
 import Fish from './fish/Fish.jsx';
@@ -64,6 +65,10 @@ function App() {
           element:<Profile/>
         },
         {
+          path:"/group",
+          element:<Groups/>  // Add the new Groups route
+        },
+        {
           path:"/group/:id",
           element:<Group/>
         },
@@ -75,7 +80,7 @@ function App() {
           path:"/chat",
           element:<Chat/>
         },
-        // New routes
+        // Other routes
         {
           path:"/fish",
           element:<Fish/>

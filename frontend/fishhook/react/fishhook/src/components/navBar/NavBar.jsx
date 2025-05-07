@@ -32,6 +32,7 @@ const NavBar = () => {
           </Link>
         </div>
         
+        {/* Updated this link to point to /group (all groups) instead of a specific group */}
         <Link to="/group" style={{ textDecoration: "none", color: "inherit" }}>
           <div className="item">
             <Diversity3OutlinedIcon style={{ fontSize: 60 }}/>
