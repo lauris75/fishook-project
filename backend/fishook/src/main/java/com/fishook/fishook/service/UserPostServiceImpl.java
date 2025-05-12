@@ -7,6 +7,7 @@ import com.fishook.fishook.entity.PostComment;
 import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.entity.UserPost;
 import com.fishook.fishook.repository.UserPostRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -39,12 +40,15 @@ public class UserPostServiceImpl implements UserPostService {
 
     @Override
     public List<UserPost> getAllUserPosts() {
-        return userPostRepository.findAll();
+        // Sort posts with newest first (descending order by date)
+        return userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
 
     @Override
     public List<PostDto> getAllUserFullPosts(Long userId) {
-        return enrichPostsWithAssociatedData(userPostRepository.findAll(), null);
+        // Get all posts with newest first (descending order by date)
+        List<UserPost> allPosts = userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
+        return enrichPostsWithAssociatedData(allPosts, userId);
     }
 
     @Override
