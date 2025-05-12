@@ -25,11 +25,12 @@ const Post = ({ post, onPostDeleted }) => {
   
   const isOwnPost = post.userId === currentUser.id;
   
+  // Updated to sort newest-first
   const sortCommentsByDate = (commentsArray) => {
     return [...commentsArray].sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateA - dateB;
+      return dateB - dateA; // Changed from dateA - dateB to sort newest-first
     });
   };
   

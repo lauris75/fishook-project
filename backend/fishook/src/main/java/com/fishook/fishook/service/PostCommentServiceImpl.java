@@ -11,7 +11,6 @@ public class PostCommentServiceImpl implements PostCommentService {
 
     private final PostCommentRepository postCommentRepository;
 
-
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository) {
         this.postCommentRepository = postCommentRepository;
     }
@@ -39,6 +38,6 @@ public class PostCommentServiceImpl implements PostCommentService {
 
     @Override
     public List<PostComment> getCommentsByPostId(Long postId) {
-        return postCommentRepository.getCommentsByPostId(postId);
+        return postCommentRepository.getAllByPostIdOrderByDateDesc(postId);
     }
 }
