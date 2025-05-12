@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { api } from "../context/AuthContext";
 import InfoCard from "../components/infoCard/InfoCard";
 import SearchFilter from "../components/searchFilter/SearchFilter";
@@ -8,6 +8,7 @@ import "./Fish.scss";
 const Fish = () => {
   const { id } = useParams();
   const [fishData, setFishData] = useState(null);
+  const [relatedLakes, setRelatedLakes] = useState([]);
   const [allFish, setAllFish] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,8 +19,39 @@ const Fish = () => {
     const fetchFishData = async () => {
       try {
         if (id) {
-          const response = await api.get(`/fish/${id}`);
+          // Get fish with related lakes
+          const response = await api.get(`/fish/${id}/withLakes`);
           setFishData(response.data);
+          
+          // If fish has lakes property and it's an array
+          if (response.data.lakes && Array.isArray(response.data.lakes)) {
+            // Sort lakes alphabetically by name
+            const sortedLakes = [...response.data.lakes].sort((a, b) => 
+              a.name.localeCompare(b.name)
+            );
+            setRelatedLakes(sortedLakes);
+          } else {
+            // Alternatively fetch lake-fish associations
+            try {
+              const lakeFishResponse = await api.get(`/lakeFish/fish/${id}`);
+              if (lakeFishResponse.data && lakeFishResponse.data.length > 0) {
+                // Get lake details for each association
+                const lakePromises = lakeFishResponse.data.map(lakeFish => 
+                  api.get(`/lake/${lakeFish.lakeId}`)
+                );
+                const lakeResponses = await Promise.all(lakePromises);
+                const lakes = lakeResponses.map(res => res.data);
+                
+                // Sort lakes alphabetically by name
+                const sortedLakes = [...lakes].sort((a, b) => 
+                  a.name.localeCompare(b.name)
+                );
+                setRelatedLakes(sortedLakes);
+              }
+            } catch (lakeFishErr) {
+              console.error("Error fetching lake-fish associations:", lakeFishErr);
+            }
+          }
         } else {
           const response = await api.get("/fish");
           setAllFish(response.data);
@@ -63,6 +95,32 @@ const Fish = () => {
           summary={fishData.summary}
           description={fishData.description}
         />
+        
+        {/* Related Lakes Section */}
+        <div className="related-section">
+          <h2>This fish can be found in these lakes:</h2>
+          
+          {relatedLakes.length === 0 ? (
+            <p className="no-related-items">No lakes recorded for this fish species yet.</p>
+          ) : (
+            <div className="related-items-grid">
+              {relatedLakes.map((lake) => (
+                <div className="lake-card" key={lake.id} onClick={() => window.location.href = `/lake/${lake.id}`}>
+                  <div className="lake-image">
+                    <img src={lake.photoURL} alt={lake.name} />
+                  </div>
+                  <div className="lake-info">
+                    <h3>{lake.name}</h3>
+                    <p>{lake.summary.substring(0, 100)}...</p>
+                    <div className="lake-coords">
+                      <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

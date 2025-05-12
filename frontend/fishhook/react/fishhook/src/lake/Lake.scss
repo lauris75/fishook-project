@@ -113,5 +113,76 @@
     padding: 20px 0;
     max-width: 1200px;
     margin: 0 auto;
+    
+    /* New styles for related items section */
+    .related-section {
+      margin-top: 40px;
+      
+      h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+        border-bottom: 2px solid #5F9EA0;
+        padding-bottom: 10px;
+      }
+      
+      .no-related-items {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        color: #666;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .related-items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        
+        .fish-card {
+          background-color: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+          
+          &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+          }
+          
+          .fish-image {
+            height: 180px;
+            width: 100%;
+            overflow: hidden;
+            
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+          
+          .fish-info {
+            padding: 15px;
+            
+            h3 {
+              font-size: 18px;
+              margin-bottom: 8px;
+              color: #5F9EA0;
+            }
+            
+            p {
+              font-size: 14px;
+              color: #555;
+              line-height: 1.5;
+            }
+          }
+        }
+      }
+    }
   }
 }
