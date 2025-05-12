@@ -45,6 +45,11 @@ const Posts = ({ userId, groupId }) => {
     // Add the new post to the top of the posts list
     setPosts(prevPosts => [newPost, ...prevPosts]);
   };
+  
+  const handlePostDeleted = (postId) => {
+    // Remove the deleted post from the posts list
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+  };
 
   if (loading) return <div className="posts">Loading posts...</div>;
   if (error) return <div className="posts">Error: {error}</div>;
@@ -59,9 +64,19 @@ const Posts = ({ userId, groupId }) => {
       />
       
       {/* List of posts */}
-      {posts.map(post => (
-        <Post post={post} key={post.id} />
-      ))}
+      {posts.length === 0 ? (
+        <div className="no-posts">
+          <p>No posts to display</p>
+        </div>
+      ) : (
+        posts.map(post => (
+          <Post 
+            post={post} 
+            key={post.id} 
+            onPostDeleted={handlePostDeleted}
+          />
+        ))
+      )}
     </div>
   );
 };

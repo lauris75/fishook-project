@@ -1,6 +1,19 @@
 .posts{
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-    padding: 20px 50px 20px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  padding: 20px 50px 20px 0px;
+  
+  .no-posts {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    
+    p {
+      font-size: 16px;
+      color: #666;
+    }
   }
+}

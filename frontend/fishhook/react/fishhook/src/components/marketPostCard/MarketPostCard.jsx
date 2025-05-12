@@ -1,13 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { formatDistanceToNow } from 'date-fns';
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import ConfirmationModal from "../confirmationModal/ConfirmationModal";
 import "./MarketPostCard.scss";
 
-const MarketPostCard = ({ post }) => {
+const MarketPostCard = ({ post, onPostDeleted }) => {
+  const { currentUser } = useContext(AuthContext);
   const [seller, setSeller] = useState(null);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const moreOptionsRef = useRef(null);
+  
+  const isOwnPost = post.userId === currentUser.id;
 
   useEffect(() => {
     const fetchAdditionalData = async () => {
@@ -40,6 +50,40 @@ const MarketPostCard = ({ post }) => {
     parseFloat(post.price).toFixed(2) : 
     '0.00';
   
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+  
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+  
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/market/${post.id}`);
+      
+      if (onPostDeleted) {
+        onPostDeleted(post.id);
+      } else {
+        // If no callback provided, we can show a success message or refresh the page
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error deleting market listing:", error);
+      alert("Failed to delete listing. Please try again.");
+    } finally {
+      closeDeleteModal();
+    }
+  };
+  
+  const moreOptions = [
+    {
+      label: "Delete Listing",
+      icon: <DeleteOutlineIcon fontSize="small" />,
+      onClick: openDeleteModal
+    }
+  ];
+  
   if (loading) {
     return <div className="market-post-card loading">Loading...</div>;
   }
@@ -67,9 +111,20 @@ const MarketPostCard = ({ post }) => {
         </div>
         <div className="post-meta">
           <span className="post-date">{formattedDate}</span>
-          {category && (
-            <span className="post-category">{category.name}</span>
-          )}
+          <div className="meta-right">
+            {category && (
+              <span className="post-category">{category.name}</span>
+            )}
+            {isOwnPost && (
+              <div className="more-options" ref={moreOptionsRef}>
+                <MoreHorizIcon style={{ cursor: 'pointer' }} />
+                <DropdownMenu 
+                  options={moreOptions} 
+                  anchorEl={moreOptionsRef.current} 
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
@@ -88,6 +143,14 @@ const MarketPostCard = ({ post }) => {
           Contact Seller
         </button>
       </div>
+      
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Delete Listing"
+        message="Are you sure you want to delete this marketplace listing? This action cannot be undone."
+      />
     </div>
   );
 };

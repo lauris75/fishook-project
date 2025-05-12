@@ -4,16 +4,25 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { formatDistanceToNow } from 'date-fns';
 import { api } from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import ConfirmationModal from "../confirmationModal/ConfirmationModal";
 
-const Post = ({ post }) => {
+const Post = ({ post, onPostDeleted }) => {
+  const { currentUser } = useContext(AuthContext);
   const [commentOpen, setCommentOpen] = useState(false);
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const moreOptionsRef = useRef(null);
+  
+  const isOwnPost = post.userId === currentUser.id;
   
   const sortCommentsByDate = (commentsArray) => {
     return [...commentsArray].sort((a, b) => {
@@ -61,6 +70,40 @@ const Post = ({ post }) => {
     }
   };
   
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+  
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+  
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/userPost/${post.id}`);
+      
+      if (onPostDeleted) {
+        onPostDeleted(post.id);
+      } else {
+        // If no callback provided, we can show a success message or refresh the page
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alert("Failed to delete post. Please try again.");
+    } finally {
+      closeDeleteModal();
+    }
+  };
+  
+  const moreOptions = [
+    {
+      label: "Delete Post",
+      icon: <DeleteOutlineIcon fontSize="small" />,
+      onClick: openDeleteModal
+    }
+  ];
+  
   return (
     <div className="post">
       <div className="container">
@@ -79,7 +122,17 @@ const Post = ({ post }) => {
               <span className="date">{formattedDate}</span>
             </div>
           </div>
-          <MoreHorizIcon />
+          <div className="more-options" ref={moreOptionsRef}>
+            {isOwnPost && (
+              <>
+                <MoreHorizIcon style={{ cursor: 'pointer' }} />
+                <DropdownMenu 
+                  options={moreOptions} 
+                  anchorEl={moreOptionsRef.current} 
+                />
+              </>
+            )}
+          </div>
         </div>
         <div className="content">
           <p>{post.content}</p>
@@ -105,6 +158,14 @@ const Post = ({ post }) => {
           onCommentAdded={handleCommentAdded} 
         />}
       </div>
+      
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+      />
     </div>
   );
 };

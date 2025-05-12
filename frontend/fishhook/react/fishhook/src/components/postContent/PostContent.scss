@@ -36,6 +36,22 @@
             }
           }
         }
+        
+        .more-options {
+          position: relative;
+          cursor: pointer;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background-color: #f0f0f0;
+          }
+        }
       }
 
       .content {
@@ -46,6 +62,10 @@
           max-height: 500px;
           object-fit: cover;
           margin-top: 20px;
+        }
+        
+        p {
+          line-height: 1.5;
         }
       }
 

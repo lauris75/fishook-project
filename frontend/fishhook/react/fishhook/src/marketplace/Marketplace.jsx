@@ -73,6 +73,12 @@ const Marketplace = () => {
     setSelectedCategory("all");
   };
   
+  const handlePostDeleted = (postId) => {
+    // Remove the deleted post from both marketPosts and filteredPosts
+    setMarketPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    setFilteredPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+  };
+  
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
   };
@@ -119,7 +125,11 @@ const Marketplace = () => {
       ) : (
         <div className="market-posts-grid">
           {filteredPosts.map(post => (
-            <MarketPostCard key={post.id} post={post} />
+            <MarketPostCard 
+              key={post.id} 
+              post={post} 
+              onPostDeleted={handlePostDeleted}
+            />
           ))}
         </div>
       )}
