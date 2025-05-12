@@ -26,9 +26,9 @@ public class Chat {
     @Column(name = "receiverId", nullable = false)
     private Long receiverId;
 
-    @Column(name = "message", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
-
+    
     @Column(name = "type", length = 10, nullable = false)
     private String type;
 
