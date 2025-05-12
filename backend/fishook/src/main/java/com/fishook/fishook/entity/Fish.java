@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,4 +31,7 @@ public class Fish {
 
     @Column(name = "photoURL", columnDefinition = "TEXT", nullable = false)
     private String photoURL;
+
+    @Transient
+    private List<Lake> lakes;
 }

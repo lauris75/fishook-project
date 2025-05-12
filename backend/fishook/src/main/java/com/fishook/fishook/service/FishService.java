@@ -13,5 +13,7 @@ public interface FishService {
 
     Optional<Fish> getFishbyId(Long fishId);
 
+    Optional<Fish> getFishWithLakes(Long fishId);
+
     String deleteFishById(Long fishId);
 }

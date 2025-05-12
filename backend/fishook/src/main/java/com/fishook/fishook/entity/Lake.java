@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -35,4 +37,7 @@ public class Lake {
 
     @Column(name = "longitude", length = 30, nullable = false)
     private String longitude;
+
+    @Transient
+    private List<Fish> fishes;
 }

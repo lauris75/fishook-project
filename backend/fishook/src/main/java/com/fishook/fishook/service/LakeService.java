@@ -13,5 +13,11 @@ public interface LakeService {
 
     Optional<Lake> getLakeById(Long lakeId);
 
+    Optional<Lake> getLakeWithFish(Long lakeId);
+
+    void addFishToLake(Long lakeId, Long fishId);
+
+    void removeFishFromLake(Long lakeId, Long fishId);
+
     String deleteLake(Long lakeId);
 }
