@@ -20,6 +20,7 @@ const Post = ({ post, onPostDeleted }) => {
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
   const isOwnPost = post.userId === currentUser.id;
@@ -96,11 +97,16 @@ const Post = ({ post, onPostDeleted }) => {
     }
   };
   
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+  
   const moreOptions = [
     {
       label: "Delete Post",
       icon: <DeleteOutlineIcon fontSize="small" />,
-      onClick: openDeleteModal
+      onClick: openDeleteModal,
+      danger: true
     }
   ];
   
@@ -122,17 +128,19 @@ const Post = ({ post, onPostDeleted }) => {
               <span className="date">{formattedDate}</span>
             </div>
           </div>
-          <div className="more-options" ref={moreOptionsRef}>
-            {isOwnPost && (
-              <>
+          {isOwnPost && (
+            <div className="more-options" ref={moreOptionsRef}>
+              <div onClick={toggleMenu}>
                 <MoreHorizIcon style={{ cursor: 'pointer' }} />
-                <DropdownMenu 
-                  options={moreOptions} 
-                  anchorEl={moreOptionsRef.current} 
-                />
-              </>
-            )}
-          </div>
+              </div>
+              <DropdownMenu 
+                options={moreOptions} 
+                anchorEl={moreOptionsRef.current}
+                isOpen={menuOpen}
+                setIsOpen={setMenuOpen}
+              />
+            </div>
+          )}
         </div>
         <div className="content">
           <p>{post.content}</p>

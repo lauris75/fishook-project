@@ -1,20 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './DropdownMenu.scss';
 
-const DropdownMenu = ({ options, anchorEl }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const DropdownMenu = ({ options, anchorEl, isOpen, setIsOpen }) => {
   const menuRef = useRef(null);
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleOptionClick = (onClickHandler) => {
-    setIsOpen(false);
-    if (onClickHandler) {
-      onClickHandler();
-    }
-  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -29,19 +17,23 @@ const DropdownMenu = ({ options, anchorEl }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [anchorEl]);
+  }, [anchorEl, setIsOpen]);
+
+  const handleOptionClick = (onClickHandler) => {
+    setIsOpen(false);
+    if (onClickHandler) {
+      onClickHandler();
+    }
+  };
 
   return (
-    <div className="dropdown-container">
-      <div className="dropdown-toggle" onClick={toggleMenu} ref={anchorEl}>
-        {/* This is just a container for the toggle button */}
-      </div>
+    <>
       {isOpen && (
         <div className="dropdown-menu" ref={menuRef}>
           {options.map((option, index) => (
             <div 
               key={index} 
-              className="dropdown-item"
+              className={`dropdown-item ${option.danger ? 'danger' : ''}`}
               onClick={() => handleOptionClick(option.onClick)}
             >
               {option.icon && <span className="dropdown-item-icon">{option.icon}</span>}
@@ -50,7 +42,7 @@ const DropdownMenu = ({ options, anchorEl }) => {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

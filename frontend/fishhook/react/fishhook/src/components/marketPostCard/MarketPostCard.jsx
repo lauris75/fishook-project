@@ -15,6 +15,7 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
   const isOwnPost = post.userId === currentUser.id;
@@ -76,11 +77,16 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
     }
   };
   
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+  
   const moreOptions = [
     {
       label: "Delete Listing",
       icon: <DeleteOutlineIcon fontSize="small" />,
-      onClick: openDeleteModal
+      onClick: openDeleteModal,
+      danger: true
     }
   ];
   
@@ -117,10 +123,14 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
             )}
             {isOwnPost && (
               <div className="more-options" ref={moreOptionsRef}>
-                <MoreHorizIcon style={{ cursor: 'pointer' }} />
+                <div onClick={toggleMenu}>
+                  <MoreHorizIcon style={{ cursor: 'pointer' }} />
+                </div>
                 <DropdownMenu 
                   options={moreOptions} 
-                  anchorEl={moreOptionsRef.current} 
+                  anchorEl={moreOptionsRef.current}
+                  isOpen={menuOpen}
+                  setIsOpen={setMenuOpen}
                 />
               </div>
             )}
