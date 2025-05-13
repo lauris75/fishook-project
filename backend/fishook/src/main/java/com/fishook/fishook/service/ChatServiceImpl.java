@@ -122,7 +122,8 @@ public class ChatServiceImpl implements ChatService {
                         sender.getLastname(),
                         sender.getEmail(),
                         sender.getProfilePicture(),
-                        sender.getDateOfBirth()
+                        sender.getDateOfBirth(),
+                        null
                 );
                 dto.setSender(senderDto);
             }
@@ -138,7 +139,8 @@ public class ChatServiceImpl implements ChatService {
                         receiver.getLastname(),
                         receiver.getEmail(),
                         receiver.getProfilePicture(),
-                        receiver.getDateOfBirth()
+                        receiver.getDateOfBirth(),
+                        null
                 );
                 dto.setReceiver(receiverDto);
             }

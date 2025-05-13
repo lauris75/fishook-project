@@ -40,13 +40,11 @@ public class UserPostServiceImpl implements UserPostService {
 
     @Override
     public List<UserPost> getAllUserPosts() {
-        // Sort posts with newest first (descending order by date)
         return userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
 
     @Override
     public List<PostDto> getAllUserFullPosts(Long userId) {
-        // Get all posts with newest first (descending order by date)
         List<UserPost> allPosts = userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
         return enrichPostsWithAssociatedData(allPosts, userId);
     }
@@ -69,8 +67,6 @@ public class UserPostServiceImpl implements UserPostService {
         return "Deleted";
     }
 
-    // New methods to fetch posts with full details
-
     @Override
     public PostDto getPostDtoById(Long postId, Long currentUserId) {
         UserPost post = userPostRepository.findById(postId)
@@ -91,23 +87,12 @@ public class UserPostServiceImpl implements UserPostService {
         return enrichPostsWithAssociatedData(posts, currentUserId);
     }
 
-    /**
-     * Enriches a list of posts with additional data
-     */
     private List<PostDto> enrichPostsWithAssociatedData(List<UserPost> posts, Long currentUserId) {
         return posts.stream()
                 .map(post -> enrichPostWithAssociatedData(post, currentUserId))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Enriches a single post with additional data:
-     * - User information
-     * - Like count
-     * - Comment count
-     * - Current user's like status
-     * - Comments
-     */
     private PostDto enrichPostWithAssociatedData(UserPost post, Long currentUserId) {
         PostDto postDto = convertToDto(post);
 
@@ -120,7 +105,8 @@ public class UserPostServiceImpl implements UserPostService {
                 userEntity.getLastname(),
                 userEntity.getEmail(),
                 userEntity.getProfilePicture(),
-                userEntity.getDateOfBirth()
+                userEntity.getDateOfBirth(),
+                null
         );
         postDto.setUser(userDto);
 
@@ -131,9 +117,6 @@ public class UserPostServiceImpl implements UserPostService {
         return postDto;
     }
 
-    /**
-     * Converts basic UserPost entity to PostDto
-     */
     private PostDto convertToDto(UserPost post) {
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
@@ -145,9 +128,6 @@ public class UserPostServiceImpl implements UserPostService {
         return postDto;
     }
 
-    /**
-     * Enriches a post DTO with like-related information
-     */
     private void enrichWithLikeData(PostDto postDto, Long currentUserId) {
         // Set like count
         Integer likeCount = postLikesService.getCountByPostId(postDto.getId());
@@ -162,11 +142,7 @@ public class UserPostServiceImpl implements UserPostService {
         }
     }
 
-    /**
-     * Enriches a post DTO with comment-related information
-     */
     private void enrichWithCommentData(PostDto postDto, Long currentUserId) {
-        // Get comments from service
         List<PostComment> postComments = postCommentService.getCommentsByPostId(postDto.getId());
 
         List<CommentDto> comments = postComments.stream().map(comment -> {
@@ -176,22 +152,20 @@ public class UserPostServiceImpl implements UserPostService {
             commentDto.setContent(comment.getContent());
             commentDto.setDate(comment.getDate());
 
-            // Get user data for this comment
             try {
                 UserEntity userEntity = userService.getUserById(comment.getUserId())
                         .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + comment.getUserId()));
 
-                // Create UserDto for comment
                 UserDto userDto = new UserDto(
                         userEntity.getId(),
                         userEntity.getName(),
                         userEntity.getLastname(),
                         userEntity.getEmail(),
                         userEntity.getProfilePicture(),
-                        userEntity.getDateOfBirth()
+                        userEntity.getDateOfBirth(),
+                        null
                 );
 
-                // Set user data in comment
                 commentDto.setUser(userDto);
             } catch (Exception e) {
             }

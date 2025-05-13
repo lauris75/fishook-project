@@ -31,7 +31,6 @@ public class AuthenticationService {
         Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
 
         if (user.isPresent()) {
-            // Return error response if user already exists
             throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
         }
 
@@ -50,7 +49,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .registrationDate(new Date())
-                .profilePicture("https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=1600")
+                .profilePicture("https://i.pinimg.com/564x/0e/ab/8d/0eab8de65a76d25a9b99d60f699d94d3.jpg")
                 .role(Role.USER)
                 .build();
 
@@ -62,7 +61,8 @@ public class AuthenticationService {
                 userEntity.getLastname(),
                 userEntity.getEmail(),
                 userEntity.getProfilePicture(),
-                userEntity.getDateOfBirth()
+                userEntity.getDateOfBirth(),
+                userEntity.getRole().toString()
         );
 
         String jwtToken = jwtService.generatetoken(userEntity);
@@ -87,7 +87,8 @@ public class AuthenticationService {
                 userEntity.getLastname(),
                 userEntity.getEmail(),
                 userEntity.getProfilePicture(),
-                userEntity.getDateOfBirth()
+                userEntity.getDateOfBirth(),
+                userEntity.getRole().toString()
         );
 
         String jwtToken = jwtService.generatetoken(userEntity);

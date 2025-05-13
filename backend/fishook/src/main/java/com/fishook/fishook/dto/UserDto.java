@@ -18,4 +18,5 @@ public class UserDto {
     private String email;
     private String profilePicture;
     private Date dateOfBirth;
+    private String role;
 }
