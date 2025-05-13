@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,8 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC")); // Set formatter to UTC
+
         Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
 
         if (user.isPresent()) {

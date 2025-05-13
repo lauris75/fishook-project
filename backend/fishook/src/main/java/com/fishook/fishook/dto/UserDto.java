@@ -1,5 +1,6 @@
 package com.fishook.fishook.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class UserDto {
     private String lastname;
     private String email;
     private String profilePicture;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
     private Date dateOfBirth;
     private String role;
 }

@@ -1,5 +1,6 @@
 package com.fishook.fishook.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
     @Column(name = "dateOfBirth")
     private Date dateOfBirth;
 
