@@ -1,5 +1,7 @@
 package com.fishook.fishook.controller;
 
+import com.fishook.fishook.config.SecurityService;
+import com.fishook.fishook.dto.UserProfileUpdateRequest;
 import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping
@@ -33,6 +38,16 @@ public class UserController {
     @GetMapping("/{userID}")
     public Optional<UserEntity> fetchUserByID(@PathVariable Long userID) {
         return userService.getUserById(userID);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UserProfileUpdateRequest request) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(userService.updateUserProfile(currentUserId, request));
     }
 
     @DeleteMapping("/{userID}")

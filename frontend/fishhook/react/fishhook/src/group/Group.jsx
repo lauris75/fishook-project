@@ -4,8 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useAdmin } from "../hooks/useAdmin";
 import Posts from "../components/posts/Posts.jsx";
+import GroupUpdateForm from "../components/groupUpdateForm/GroupUpdateForm";
 import { api } from "../context/AuthContext";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditIcon from '@mui/icons-material/Edit';
 import ConfirmationModal from "../components/confirmationModal/ConfirmationModal";
 
 const Group = () => {
@@ -19,6 +21,7 @@ const Group = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -74,6 +77,18 @@ const Group = () => {
       setIsDeleteModalOpen(false);
     }
   };
+  
+  const handleOpenUpdateForm = () => {
+    setShowUpdateForm(true);
+  };
+
+  const handleCloseUpdateForm = () => {
+    setShowUpdateForm(false);
+  };
+
+  const handleGroupUpdate = (updatedGroup) => {
+    setGroup(updatedGroup);
+  };
 
   if (loading) return <div className="group">Loading group...</div>;
   if (error) return <div className="group">Error: {error}</div>;
@@ -111,7 +126,9 @@ const Group = () => {
           </div>
           <div className="action">
             {isOwner ? (
-              <button>Update Group</button>
+              <button className="edit-group-btn" onClick={handleOpenUpdateForm}>
+                <EditIcon /> Update Group
+              </button>
             ) : isAdmin ? (
               <button 
                 className="admin-delete-btn"
@@ -132,6 +149,14 @@ const Group = () => {
       <div className="posts">
         <Posts groupId={parseInt(id)} />
       </div>
+
+      {showUpdateForm && (
+        <GroupUpdateForm 
+          group={group} 
+          onClose={handleCloseUpdateForm} 
+          onUpdate={handleGroupUpdate} 
+        />
+      )}
 
       <ConfirmationModal
         isOpen={isDeleteModalOpen}

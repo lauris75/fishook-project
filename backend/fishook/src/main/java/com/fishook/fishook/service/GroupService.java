@@ -1,5 +1,6 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.GroupUpdateRequest;
 import com.fishook.fishook.entity.Group;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface GroupService {
     List<Group> getGroupsByOwnerId(Long ownderId);
 
     Optional<Group> getGroupById(Long groupId);
+
+    Group updateGroup(Long groupId, GroupUpdateRequest updateRequest);
 
     String deleteGroupId(Long groupId);
 }

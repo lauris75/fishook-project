@@ -51,6 +51,9 @@
         .about{
             font-size: 20px;
             padding: 10px;
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 20px;
         }
         
         .action{
@@ -61,6 +64,21 @@
                 padding: 10px 20px;
                 border-radius: 5px;
                 cursor: pointer;
+                transition: background-color 0.2s;
+                
+                &:hover {
+                  background-color: darken(#5271ff, 10%);
+                }
+            }
+            
+            .edit-profile-btn {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              
+              svg {
+                font-size: 18px;
+              }
             }
         }
     }

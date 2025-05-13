@@ -4,6 +4,8 @@ import { AuthContext } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
 import { api } from "../context/AuthContext";
 import Posts from "../components/posts/Posts";
+import ProfileUpdateForm from "../components/profileUpdateForm/ProfileUpdateForm";
+import EditIcon from '@mui/icons-material/Edit';
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
@@ -12,6 +14,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
   
   // Check if we're viewing our own profile
   const userId = id ? parseInt(id) : currentUser.id;
@@ -71,6 +74,33 @@ const Profile = () => {
     }
   };
 
+  const handleOpenUpdateForm = () => {
+    setShowUpdateForm(true);
+  };
+
+  const handleCloseUpdateForm = () => {
+    setShowUpdateForm(false);
+  };
+
+  const handleProfileUpdate = (updatedProfile) => {
+    // Update the profile state with the new data
+    setProfile({
+      ...profile,
+      ...updatedProfile
+    });
+
+    // If it's the current user's profile, also update the currentUser in context
+    if (isOwnProfile) {
+      // We're only updating the AuthContext user via localStorage update
+      // The context provider will pick up the change on next page load
+      const updatedUser = {
+        ...currentUser,
+        ...updatedProfile
+      };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
+
   if (loading) return <div className="profile">Loading profile...</div>;
   if (error) return <div className="profile">Error: {error}</div>;
   if (!profile) return <div className="profile">Profile not found</div>;
@@ -98,13 +128,23 @@ const Profile = () => {
               {isFollowing ? "Unfollow" : "Follow"}
             </button>
           ) : (
-            <button>Edit Profile</button>
+            <button className="edit-profile-btn" onClick={handleOpenUpdateForm}>
+              <EditIcon /> Edit Profile
+            </button>
           )}
         </div>
       </div>
       <div className="posts">
         <Posts userId={profile.id} />
       </div>
+
+      {showUpdateForm && (
+        <ProfileUpdateForm 
+          profile={profile} 
+          onClose={handleCloseUpdateForm} 
+          onUpdate={handleProfileUpdate} 
+        />
+      )}
     </div>
   );
 };

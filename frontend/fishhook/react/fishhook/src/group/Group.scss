@@ -1,102 +1,125 @@
 .group {
-    padding-top: 20px;
-  
-    .images {
-      width: 90%;
-      height: 300px;
-      position: relative;
-      padding-bottom: 20px;
-  
-      .cover {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 10px;
-      }
-    }
-  
-    .groupContainer {
-      padding: 20px 70px;
-      width: 745px;
-      -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-      -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-      box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-      border-radius: 20px;
-      background-color: white;
-      padding: 30px;
-      margin-bottom: 20px;
-  
-      .groupInfo {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-  
-        .nameSection {
-          .name {
-            font-size: 28px;
-            margin-bottom: 15px;
-          }
-  
-          .owner {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            
-            span {
-              font-size: 16px;
-            }
-  
-            .ownerInfo {
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              
-              img.ownerPic {
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                object-fit: cover;
-              }
-            }
-          }
-        }
-  
-        .action {
-          button {
-            border: none;
-            background-color: #5271ff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-          }
+  padding-top: 20px;
 
-          .admin-delete-btn {
-            background-color: #e74c3c;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            
-            &:hover {
-              background-color: #c0392b;
-            }
-            
-            svg {
-              font-size: 18px;
-            }
-          }
-        }
-      }
-    }
-  
-    .postsTitle {
-      margin: 20px 0 10px 20px;
-      font-size: 22px;
-    }
-  
-    .posts {
-      padding: 0 px;
+  .images {
+    width: 90%;
+    height: 300px;
+    position: relative;
+    padding-bottom: 20px;
+
+    .cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
     }
   }
+
+  .groupContainer {
+    padding: 20px 70px;
+    width: 745px;
+    -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+    -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
+    border-radius: 20px;
+    background-color: white;
+    padding: 30px;
+    margin-bottom: 20px;
+
+    .groupInfo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .nameSection {
+        .name {
+          font-size: 28px;
+          margin-bottom: 15px;
+        }
+
+        .owner {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          
+          span {
+            font-size: 16px;
+          }
+
+          .ownerInfo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            img.ownerPic {
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+          }
+        }
+        
+        .description {
+          max-width: 400px;
+          margin-top: 10px;
+          font-size: 16px;
+          color: #555;
+          line-height: 1.4;
+        }
+      }
+
+      .action {
+        button {
+          border: none;
+          background-color: #5271ff;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background-color: darken(#5271ff, 10%);
+          }
+        }
+        
+        .edit-group-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          
+          svg {
+            font-size: 18px;
+          }
+        }
+
+        .admin-delete-btn {
+          background-color: #e74c3c;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          
+          &:hover {
+            background-color: #c0392b;
+          }
+          
+          svg {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+
+  .postsTitle {
+    margin: 20px 0 10px 20px;
+    font-size: 22px;
+  }
+
+  .posts {
+    padding: 0;
+  }
+}

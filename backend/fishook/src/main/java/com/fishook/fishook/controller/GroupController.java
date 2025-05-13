@@ -1,6 +1,7 @@
 package com.fishook.fishook.controller;
 
 import com.fishook.fishook.config.SecurityService;
+import com.fishook.fishook.dto.GroupUpdateRequest;
 import com.fishook.fishook.entity.Group;
 import com.fishook.fishook.entity.Role;
 import com.fishook.fishook.entity.UserEntity;
@@ -53,6 +54,28 @@ public class GroupController {
     @GetMapping("/{groupId}")
     public Optional<Group> getGroupById(@PathVariable Long groupId) {
         return groupService.getGroupById(groupId);
+    }
+
+    @PutMapping("/{groupId}")
+    public ResponseEntity<?> updateGroup(@PathVariable Long groupId, @RequestBody GroupUpdateRequest updateRequest) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<Group> groupOpt = groupService.getGroupById(groupId);
+        if (!groupOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Group group = groupOpt.get();
+        if (!currentUserId.equals(group.getOwnerId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only the group owner can update this group");
+        }
+
+        Group updatedGroup = groupService.updateGroup(groupId, updateRequest);
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @DeleteMapping("/{groupId}")
