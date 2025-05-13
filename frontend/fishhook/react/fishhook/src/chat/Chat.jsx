@@ -379,6 +379,16 @@ const Chat = () => {
                   >
                     <CloseIcon />
                   </button>
+                  
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="upload-progress-indicator">
+                      <div 
+                        className="progress-bar" 
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                  )}
                 </div>
               )}
               

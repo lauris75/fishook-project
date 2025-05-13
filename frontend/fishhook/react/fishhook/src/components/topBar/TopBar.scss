@@ -62,11 +62,17 @@
     }
     .right{
         display: flex;
-        align-items: right;
+        align-items: center;
         font-size: 25px;
         padding: 10px;
-        span{
-            padding-right: 10px;
+        
+        .logoutContainer {
+            display: flex;
+            align-items: center;
+            
+            span{
+                padding-right: 10px;
+            }
         }
     }
 }
