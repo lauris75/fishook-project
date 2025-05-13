@@ -24,53 +24,50 @@ const Register = () => {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setError(null);
-    
-    if (inputs.password !== inputs.confirmPassword) {
-      setError({
-        status: 400,
-        message: "Passwords do not match",
-        errorCode: "PASSWORD_MISMATCH"
-      });
-      return;
-    }
-    
-    if (!inputs.name || !inputs.surname || !inputs.email || !inputs.password || !inputs.date) {
-      setError({
-        status: 400,
-        message: "All fields are required",
-        errorCode: "MISSING_FIELDS"
-      });
-      return;
-    }
+  e.preventDefault();
+  setError(null);
+  
+  if (inputs.password !== inputs.confirmPassword) {
+    setError({
+      status: 400,
+      message: "Passwords do not match",
+      errorCode: "PASSWORD_MISMATCH"
+    });
+    return;
+  }
+  
+  if (!inputs.name || !inputs.surname || !inputs.email || !inputs.password || !inputs.date) {
+    setError({
+      status: 400,
+      message: "All fields are required",
+      errorCode: "MISSING_FIELDS"
+    });
+    return;
+  }
 
-    try {
-      const { confirmPassword, ...dataToSend } = inputs;
-      const response = await axios.post("http://localhost:8081/auth/register", dataToSend);
-      
-      if (response.data && response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        
-        if (response.data.user) {
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-          login(response.data.user);
-        }
+  try {
+    const { confirmPassword, ...dataToSend } = inputs;
+    const response = await axios.post("http://localhost:8081/auth/register", dataToSend);
+    
+    if (response.data && response.data.token) {
+      if (response.data.user) {
+        login(response.data.user, response.data.token);
         navigate("/");
       }
-    } catch (err) {
-      if (err.response && err.response.data) {
-        setError(err.response.data);
-        console.log("Registration error:", err.response.data);
-      } else {
-        setError({ 
-          status: 500, 
-          message: "An unexpected error occurred", 
-          errorCode: "UNKNOWN_ERROR" 
-        });
-      }
     }
-  };
+  } catch (err) {
+    if (err.response && err.response.data) {
+      setError(err.response.data);
+      console.log("Registration error:", err.response.data);
+    } else {
+      setError({ 
+        status: 500, 
+        message: "An unexpected error occurred", 
+        errorCode: "UNKNOWN_ERROR" 
+      });
+    }
+  }
+};
 
   return (
     <div className="register">
