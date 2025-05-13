@@ -52,15 +52,53 @@ public class LakeController {
     }
 
     @PostMapping("/{lakeId}/fish/{fishId}")
+    @Operation(summary = "Add a fish to a lake - Admin only")
     public ResponseEntity<?> addFishToLake(@PathVariable Long lakeId, @PathVariable Long fishId) {
-        lakeService.addFishToLake(lakeId, fishId);
-        return ResponseEntity.ok("Fish added to lake successfully");
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can manage lake-fish associations");
+        }
+
+        try {
+            lakeService.addFishToLake(lakeId, fishId);
+            return ResponseEntity.ok("Fish added to lake successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error adding fish to lake: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{lakeId}/fish/{fishId}")
+    @Operation(summary = "Remove a fish from a lake - Admin only")
     public ResponseEntity<?> removeFishFromLake(@PathVariable Long lakeId, @PathVariable Long fishId) {
-        lakeService.removeFishFromLake(lakeId, fishId);
-        return ResponseEntity.ok("Fish removed from lake successfully");
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can manage lake-fish associations");
+        }
+
+        try {
+            lakeService.removeFishFromLake(lakeId, fishId);
+            return ResponseEntity.ok("Fish removed from lake successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error removing fish from lake: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{lakeId}")

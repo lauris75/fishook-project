@@ -6,6 +6,7 @@ import com.fishook.fishook.entity.LakeFish;
 import com.fishook.fishook.repository.LakeRepository;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,7 @@ public class LakeServiceImpl implements LakeService {
     }
 
     @Override
+    @Transactional
     public void addFishToLake(Long lakeId, Long fishId) {
         if (!lakeFishService.getLakeFishByLakeIdAndFishId(lakeId, fishId).isPresent()) {
             LakeFish lakeFish = new LakeFish();
@@ -82,11 +84,13 @@ public class LakeServiceImpl implements LakeService {
     }
 
     @Override
+    @Transactional
     public void removeFishFromLake(Long lakeId, Long fishId) {
         lakeFishService.deleteLakeFishByLakeIdAndFishId(lakeId, fishId);
     }
 
     @Override
+    @Transactional
     public Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest) {
         Lake lake = lakeRepository.findById(lakeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lake not found with id: " + lakeId));
@@ -115,6 +119,7 @@ public class LakeServiceImpl implements LakeService {
     }
 
     @Override
+    @Transactional
     public String deleteLake(Long lakeId) {
         lakeRepository.deleteById(lakeId);
         return "Deleted";

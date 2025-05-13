@@ -5,6 +5,7 @@ import { useAdmin } from "../hooks/useAdmin";
 import InfoCard from "../components/infoCard/InfoCard";
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import LakeEditButton from "../components/lakeEditButton/LakeEditButton";
+import LakeFishManager from "../components/lakeFishManager/LakeFishManager";
 import "./Lake.scss";
 
 const Lake = () => {
@@ -100,6 +101,45 @@ const Lake = () => {
       longitude: updatedLake.longitude
     }));
   };
+  
+  // Handle fish associations changes
+  const handleAssociationsChanged = (action, changedFish) => {
+    if (action === 'add') {
+      // Add the new fish to the related fish list
+      setRelatedFish(prev => {
+        const updated = [...prev, changedFish];
+        // Sort alphabetically
+        return updated.sort((a, b) => a.name.localeCompare(b.name));
+      });
+    } else if (action === 'remove') {
+      // Remove the fish from the related fish list
+      setRelatedFish(prev => 
+        prev.filter(fish => fish.id !== changedFish.id)
+      );
+    }
+    
+    // Also update the lake data to reflect the change
+    setLakeData(prev => {
+      if (!prev.fishes) {
+        prev.fishes = [];
+      }
+      
+      if (action === 'add') {
+        const updatedFishes = [...prev.fishes, changedFish];
+        return {
+          ...prev,
+          fishes: updatedFishes
+        };
+      } else if (action === 'remove') {
+        return {
+          ...prev,
+          fishes: prev.fishes.filter(fish => fish.id !== changedFish.id)
+        };
+      }
+      
+      return prev;
+    });
+  };
 
   if (loading) return <div className="lake-page">Loading lake information...</div>;
   if (error) return <div className="lake-page">Error: {error}</div>;
@@ -120,10 +160,14 @@ const Lake = () => {
           }}
         />
         
-        {/* Admin Edit Button */}
+        {/* Admin Buttons */}
         {isAdmin && (
           <div className="admin-actions">
             <LakeEditButton lake={lakeData} onLakeUpdated={handleLakeUpdated} />
+            <LakeFishManager 
+              lake={{...lakeData, fishes: relatedFish}} 
+              onAssociationsChanged={handleAssociationsChanged} 
+            />
           </div>
         )}
         

@@ -6,6 +6,7 @@ import com.fishook.fishook.entity.Fish;
 import com.fishook.fishook.entity.Role;
 import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.service.FishService;
+import com.fishook.fishook.service.LakeService;
 import com.fishook.fishook.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,9 @@ public class FishController {
     private FishService fishService;
 
     @Autowired
+    private LakeService lakeService;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping
@@ -49,6 +53,56 @@ public class FishController {
     @GetMapping("/{fishId}/withLakes")
     public ResponseEntity<?> getFishWithLakes(@PathVariable Long fishId) {
         return fishService.getFishWithLakes(fishId).map(fish -> ResponseEntity.ok(fish)).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{fishId}/lake/{lakeId}")
+    @Operation(summary = "Add a lake to a fish - Admin only")
+    public ResponseEntity<?> addLakeToFish(@PathVariable Long fishId, @PathVariable Long lakeId) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can manage fish-lake associations");
+        }
+
+        try {
+            lakeService.addFishToLake(lakeId, fishId);
+            return ResponseEntity.ok("Lake added to fish successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error adding lake to fish: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{fishId}/lake/{lakeId}")
+    @Operation(summary = "Remove a lake from a fish - Admin only")
+    public ResponseEntity<?> removeLakeFromFish(@PathVariable Long fishId, @PathVariable Long lakeId) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can manage fish-lake associations");
+        }
+
+        try {
+            lakeService.removeFishFromLake(lakeId, fishId);
+            return ResponseEntity.ok("Lake removed from fish successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error removing lake from fish: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{fishId}")

@@ -3,6 +3,7 @@ package com.fishook.fishook.service;
 import com.fishook.fishook.entity.LakeFish;
 import com.fishook.fishook.repository.LakeFishRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,12 +43,14 @@ public class LakeFishServiceImpl implements LakeFishService {
     }
 
     @Override
+    @Transactional
     public String deleteLakeFish(Long lakeFishId) {
         lakeFishRepository.deleteById(lakeFishId);
         return "Deleted";
     }
 
     @Override
+    @Transactional
     public String deleteLakeFishByLakeIdAndFishId(Long lakeId, Long fishId) {
         lakeFishRepository.deleteByLakeIdAndFishId(lakeId, fishId);
         return "Deleted";
