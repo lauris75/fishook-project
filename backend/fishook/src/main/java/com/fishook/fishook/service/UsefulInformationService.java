@@ -1,5 +1,6 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.UsefulInfoUpdateRequest;
 import com.fishook.fishook.entity.UsefulInformation;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public interface UsefulInformationService {
     List<UsefulInformation> getAllUsefulInformation();
 
     Optional<UsefulInformation> getUsefulInformationById(Long usefulInformationId);
+
+    UsefulInformation updateUsefulInformation(Long usefulInformationId, UsefulInfoUpdateRequest updateRequest);
 
     String deleteUsefulInformation(Long usefulInformationId);
 }

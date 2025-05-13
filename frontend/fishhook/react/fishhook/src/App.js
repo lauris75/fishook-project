@@ -1,11 +1,10 @@
-// src/App.js
 import './App.css';
 import Login from './login/Login.jsx';
 import Register from './register/Register.jsx';
 import Home from './home/Home.jsx';
 import Profile from './profile/Profile.jsx';
 import Group from './group/Group.jsx';
-import Groups from './group/Groups.jsx'; // Import the new Groups component
+import Groups from './group/Groups.jsx';
 import Marketplace from './marketplace/Marketplace.jsx';
 import Chat from './chat/Chat.jsx';
 import Fish from './fish/Fish.jsx';
@@ -24,10 +23,9 @@ import NavBar from "./components/navBar/NavBar.jsx";
 import RightBar from "./components/rightBar/RightBar.jsx";
 
 function App() {
-
   const {currentUser} = useContext(AuthContext);
 
-  const Layout = ()=> {
+  const Layout = () => {
     return(
       <div>
         <TopBar/>
@@ -66,7 +64,7 @@ function App() {
         },
         {
           path:"/group",
-          element:<Groups/>  // Add the new Groups route
+          element:<Groups/>
         },
         {
           path:"/group/:id",
@@ -80,7 +78,6 @@ function App() {
           path:"/chat",
           element:<Chat/>
         },
-        // Other routes
         {
           path:"/fish",
           element:<Fish/>

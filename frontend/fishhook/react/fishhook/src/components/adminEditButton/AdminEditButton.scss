@@ -1,0 +1,35 @@
+.admin-edit-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #5F9EA0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+  
+  &:hover {
+    background-color: darken(#5F9EA0, 10%);
+  }
+  
+  svg {
+    font-size: 18px;
+  }
+}
+
+/* Styling for the admin actions container */
+.admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 15px 0;
+  padding: 0 20px;
+  
+  .admin-edit-button {
+    margin-left: 10px;
+  }
+}

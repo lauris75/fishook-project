@@ -1,7 +1,13 @@
 package com.fishook.fishook.controller;
 
+import com.fishook.fishook.config.SecurityService;
+import com.fishook.fishook.dto.LakeUpdateRequest;
 import com.fishook.fishook.entity.Lake;
+import com.fishook.fishook.entity.Role;
+import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.service.LakeService;
+import com.fishook.fishook.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +23,13 @@ import java.util.stream.Collectors;
 public class LakeController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private LakeService lakeService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<?> createLake(@RequestBody Lake lake) {
@@ -49,6 +61,31 @@ public class LakeController {
     public ResponseEntity<?> removeFishFromLake(@PathVariable Long lakeId, @PathVariable Long fishId) {
         lakeService.removeFishFromLake(lakeId, fishId);
         return ResponseEntity.ok("Fish removed from lake successfully");
+    }
+
+    @PutMapping("/{lakeId}")
+    @Operation(summary = "Update lake details - Admin only")
+    public ResponseEntity<?> updateLake(@PathVariable Long lakeId, @RequestBody LakeUpdateRequest updateRequest) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can update lake information");
+        }
+
+        try {
+            Lake updatedLake = lakeService.updateLake(lakeId, updateRequest);
+            return ResponseEntity.ok(updatedLake);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Lake not found with id: " + lakeId);
+        }
     }
 
     @DeleteMapping("/{lakeId}")

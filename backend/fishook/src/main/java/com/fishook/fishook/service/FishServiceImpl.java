@@ -1,9 +1,11 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.FishUpdateRequest;
 import com.fishook.fishook.entity.Fish;
 import com.fishook.fishook.entity.LakeFish;
 import com.fishook.fishook.repository.FishRepository;
 import com.fishook.fishook.repository.LakeRepository;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -69,6 +71,26 @@ public class FishServiceImpl implements FishService {
         }
 
         return fishOpt;
+    }
+
+    @Override
+    public Fish updateFish(Long fishId, FishUpdateRequest updateRequest) {
+        Fish fish = fishRepository.findById(fishId)
+                .orElseThrow(() -> new ResourceNotFoundException("Fish not found with id: " + fishId));
+
+        if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
+            fish.setName(updateRequest.getName());
+        }
+
+        if (updateRequest.getSummary() != null && !updateRequest.getSummary().isEmpty()) {
+            fish.setSummary(updateRequest.getSummary());
+        }
+
+        if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()) {
+            fish.setDescription(updateRequest.getDescription());
+        }
+
+        return fishRepository.save(fish);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.FishUpdateRequest;
 import com.fishook.fishook.entity.Fish;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface FishService {
     Optional<Fish> getFishbyId(Long fishId);
 
     Optional<Fish> getFishWithLakes(Long fishId);
+
+    Fish updateFish(Long fishId, FishUpdateRequest updateRequest);
 
     String deleteFishById(Long fishId);
 }

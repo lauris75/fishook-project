@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../context/AuthContext";
+import { useAdmin } from "../hooks/useAdmin";
 import InfoCard from "../components/infoCard/InfoCard";
 import SearchFilter from "../components/searchFilter/SearchFilter";
+import LakeEditButton from "../components/lakeEditButton/LakeEditButton";
 import "./Lake.scss";
 
 const Lake = () => {
   const { id } = useParams();
+  const { isAdmin } = useAdmin();
   const [lakeData, setLakeData] = useState(null);
   const [relatedFish, setRelatedFish] = useState([]);
   const [allLakes, setAllLakes] = useState([]);
@@ -15,8 +18,9 @@ const Lake = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredLakes, setFilteredLakes] = useState([]);
 
+  // Fetch data based on whether we're viewing a list or a single lake
   useEffect(() => {
-    const fetchLakeData = async () => {
+    const fetchData = async () => {
       try {
         if (id) {
           // Get lake with related fish
@@ -53,6 +57,7 @@ const Lake = () => {
             }
           }
         } else {
+          // Fetch all lakes for the list view
           const response = await api.get("/lake");
           setAllLakes(response.data);
           setFilteredLakes(response.data);
@@ -64,14 +69,12 @@ const Lake = () => {
       }
     };
 
-    fetchLakeData();
+    fetchData();
   }, [id]);
 
-  // Filter lakes based on search query
+  // Filter lakes based on search query (only for list view)
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredLakes(allLakes);
-    } else {
+    if (!id && searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
       const filtered = allLakes.filter(
         lake =>
@@ -81,12 +84,27 @@ const Lake = () => {
           lake.longitude.toLowerCase().includes(query)
       );
       setFilteredLakes(filtered);
+    } else if (!id) {
+      setFilteredLakes(allLakes);
     }
-  }, [searchQuery, allLakes]);
+  }, [searchQuery, allLakes, id]);
+
+  const handleLakeUpdated = (updatedLake) => {
+    // Update the lake data while preserving fishes data
+    setLakeData(prev => ({
+      ...prev,
+      name: updatedLake.name,
+      summary: updatedLake.summary,
+      description: updatedLake.description,
+      latitude: updatedLake.latitude,
+      longitude: updatedLake.longitude
+    }));
+  };
 
   if (loading) return <div className="lake-page">Loading lake information...</div>;
   if (error) return <div className="lake-page">Error: {error}</div>;
 
+  // Detail view (single lake)
   if (id && lakeData) {
     return (
       <div className="lake-page single-view">
@@ -101,6 +119,13 @@ const Lake = () => {
             longitude: lakeData.longitude
           }}
         />
+        
+        {/* Admin Edit Button */}
+        {isAdmin && (
+          <div className="admin-actions">
+            <LakeEditButton lake={lakeData} onLakeUpdated={handleLakeUpdated} />
+          </div>
+        )}
         
         {/* Related Fish Section */}
         <div className="related-section">
@@ -128,6 +153,7 @@ const Lake = () => {
     );
   }
 
+  // List view (all lakes)
   return (
     <div className="lake-page list-view">
       <h1>Fishing Lakes</h1>

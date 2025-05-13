@@ -1,8 +1,10 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.LakeUpdateRequest;
 import com.fishook.fishook.entity.Lake;
 import com.fishook.fishook.entity.LakeFish;
 import com.fishook.fishook.repository.LakeRepository;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -82,6 +84,34 @@ public class LakeServiceImpl implements LakeService {
     @Override
     public void removeFishFromLake(Long lakeId, Long fishId) {
         lakeFishService.deleteLakeFishByLakeIdAndFishId(lakeId, fishId);
+    }
+
+    @Override
+    public Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest) {
+        Lake lake = lakeRepository.findById(lakeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lake not found with id: " + lakeId));
+
+        if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
+            lake.setName(updateRequest.getName());
+        }
+
+        if (updateRequest.getSummary() != null && !updateRequest.getSummary().isEmpty()) {
+            lake.setSummary(updateRequest.getSummary());
+        }
+
+        if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()) {
+            lake.setDescription(updateRequest.getDescription());
+        }
+
+        if (updateRequest.getLatitude() != null && !updateRequest.getLatitude().isEmpty()) {
+            lake.setLatitude(updateRequest.getLatitude());
+        }
+
+        if (updateRequest.getLongitude() != null && !updateRequest.getLongitude().isEmpty()) {
+            lake.setLongitude(updateRequest.getLongitude());
+        }
+
+        return lakeRepository.save(lake);
     }
 
     @Override

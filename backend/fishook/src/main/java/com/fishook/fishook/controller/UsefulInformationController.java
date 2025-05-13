@@ -1,7 +1,13 @@
 package com.fishook.fishook.controller;
 
+import com.fishook.fishook.config.SecurityService;
+import com.fishook.fishook.dto.UsefulInfoUpdateRequest;
+import com.fishook.fishook.entity.Role;
 import com.fishook.fishook.entity.UsefulInformation;
+import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.service.UsefulInformationService;
+import com.fishook.fishook.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +24,13 @@ import java.util.stream.Collectors;
 public class UsefulInformationController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private UsefulInformationService usefulInformationService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity createUsefulInformation(@RequestBody UsefulInformation usefulInformation) {
@@ -33,6 +45,31 @@ public class UsefulInformationController {
     @GetMapping("/{usefulInformationId}")
     public Optional<UsefulInformation> getUsefulInformationById(@PathVariable Long usefulInformationId) {
         return usefulInformationService.getUsefulInformationById(usefulInformationId);
+    }
+
+    @PutMapping("/{usefulInformationId}")
+    @Operation(summary = "Update useful information - Admin only")
+    public ResponseEntity<?> updateUsefulInformation(@PathVariable Long usefulInformationId, @RequestBody UsefulInfoUpdateRequest updateRequest) {
+        Long currentUserId = securityService.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only administrators can update useful information");
+        }
+
+        try {
+            UsefulInformation updatedInfo = usefulInformationService.updateUsefulInformation(usefulInformationId, updateRequest);
+            return ResponseEntity.ok(updatedInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Useful information not found with id: " + usefulInformationId);
+        }
     }
 
     @DeleteMapping("/{usefulInformationId}")

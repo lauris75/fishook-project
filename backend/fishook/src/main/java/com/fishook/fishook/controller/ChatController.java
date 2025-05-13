@@ -30,12 +30,10 @@ public class ChatController {
     @PostMapping
     @Operation(summary = "Create a new chat message")
     public ResponseEntity<?> createChat(@RequestBody Chat chat) {
-        // Set current time if not provided
         if (chat.getDate() == null) {
             chat.setDate(new Date());
         }
 
-        // Validate that current user is the sender
         Long currentUserId = securityService.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(chat.getSenderId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -90,7 +88,6 @@ public class ChatController {
             @PathVariable Long userId1,
             @PathVariable Long userId2) {
 
-        // Ensure current user is one of the two users
         Long currentUserId = securityService.getCurrentUserId();
         if (currentUserId == null || (!currentUserId.equals(userId1) && !currentUserId.equals(userId2))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

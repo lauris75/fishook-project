@@ -1,5 +1,6 @@
 package com.fishook.fishook.service;
 
+import com.fishook.fishook.dto.LakeUpdateRequest;
 import com.fishook.fishook.entity.Lake;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface LakeService {
     void addFishToLake(Long lakeId, Long fishId);
 
     void removeFishFromLake(Long lakeId, Long fishId);
+
+    Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest);
 
     String deleteLake(Long lakeId);
 }
