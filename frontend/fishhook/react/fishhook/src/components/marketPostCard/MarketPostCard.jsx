@@ -2,15 +2,18 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../context/AuthContext";
 import { AuthContext } from "../../context/AuthContext";
+import { useAdmin } from "../../hooks/useAdmin";
 import { formatDistanceToNow } from 'date-fns';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SecurityIcon from "@mui/icons-material/Security";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import ConfirmationModal from "../confirmationModal/ConfirmationModal";
 import "./MarketPostCard.scss";
 
 const MarketPostCard = ({ post, onPostDeleted }) => {
   const { currentUser } = useContext(AuthContext);
+  const { isAdmin } = useAdmin();
   const [seller, setSeller] = useState(null);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +21,8 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
-  const isOwnPost = post.userId === currentUser.id;
+  // Show options menu for owner or admin
+  const canManageListing = post.userId === currentUser.id || isAdmin;
 
   useEffect(() => {
     const fetchAdditionalData = async () => {
@@ -81,14 +85,20 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
     setMenuOpen(!menuOpen);
   };
   
+  // Create the options based on whether it's admin or owner deleting
   const moreOptions = [
     {
-      label: "Delete Listing",
-      icon: <DeleteOutlineIcon fontSize="small" />,
+      label: isAdmin && post.userId !== currentUser.id ? "Delete Listing (Admin)" : "Delete Listing",
+      icon: isAdmin && post.userId !== currentUser.id ? <SecurityIcon fontSize="small" /> : <DeleteOutlineIcon fontSize="small" />,
       onClick: openDeleteModal,
       danger: true
     }
   ];
+  
+  // Different message for admin vs owner
+  const deleteMessage = isAdmin && post.userId !== currentUser.id
+    ? "As an admin, you are about to delete another user's marketplace listing. This action cannot be undone."
+    : "Are you sure you want to delete this marketplace listing? This action cannot be undone.";
   
   if (loading) {
     return <div className="market-post-card loading">Loading...</div>;
@@ -121,7 +131,7 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
             {category && (
               <span className="post-category">{category.name}</span>
             )}
-            {isOwnPost && (
+            {canManageListing && (
               <div className="more-options" ref={moreOptionsRef}>
                 <div onClick={toggleMenu}>
                   <MoreHorizIcon style={{ cursor: 'pointer' }} />
@@ -159,7 +169,7 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
         title="Delete Listing"
-        message="Are you sure you want to delete this marketplace listing? This action cannot be undone."
+        message={deleteMessage}
       />
     </div>
   );

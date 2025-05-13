@@ -1,18 +1,24 @@
 import "./Group.scss"
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { useAdmin } from "../hooks/useAdmin";
 import Posts from "../components/posts/Posts.jsx";
 import { api } from "../context/AuthContext";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ConfirmationModal from "../components/confirmationModal/ConfirmationModal";
 
 const Group = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
+  const { isAdmin } = useAdmin();
   const [group, setGroup] = useState(null);
   const [owner, setOwner] = useState(null);
   const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -57,6 +63,18 @@ const Group = () => {
     }
   };
 
+  const handleDeleteGroup = async () => {
+    try {
+      await api.delete(`/group/${id}`);
+      navigate('/group'); // Navigate back to groups list
+    } catch (err) {
+      console.error("Error deleting group:", err);
+      setError(err.message || "Failed to delete group");
+    } finally {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   if (loading) return <div className="group">Loading group...</div>;
   if (error) return <div className="group">Error: {error}</div>;
   if (!group) return <div className="group">Group not found</div>;
@@ -94,6 +112,13 @@ const Group = () => {
           <div className="action">
             {isOwner ? (
               <button>Update Group</button>
+            ) : isAdmin ? (
+              <button 
+                className="admin-delete-btn"
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                <DeleteOutlineIcon /> Delete Group
+              </button>
             ) : (
               <button onClick={handleJoinLeave}>
                 {isMember ? "Leave Group" : "Join Group"}
@@ -107,6 +132,14 @@ const Group = () => {
       <div className="posts">
         <Posts groupId={parseInt(id)} />
       </div>
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteGroup}
+        title="Delete Group"
+        message="As an admin, you are about to delete this group. This will permanently delete the group and all its posts. This action cannot be undone."
+      />
     </div>
   )
 }

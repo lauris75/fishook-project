@@ -39,11 +39,6 @@ public class UserPostServiceImpl implements UserPostService {
     }
 
     @Override
-    public List<UserPost> getAllUserPosts() {
-        return userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
-    }
-
-    @Override
     public List<PostDto> getAllUserFullPosts(Long userId) {
         List<UserPost> allPosts = userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
         return enrichPostsWithAssociatedData(allPosts, userId);
@@ -73,18 +68,6 @@ public class UserPostServiceImpl implements UserPostService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
         return enrichPostWithAssociatedData(post, currentUserId);
-    }
-
-    @Override
-    public List<PostDto> getPostDtosByUserId(Long userId, Long currentUserId) {
-        List<UserPost> posts = userPostRepository.getAllByUserIdAndGroupIdOrderByDateDesc(userId, null);
-        return enrichPostsWithAssociatedData(posts, currentUserId);
-    }
-
-    @Override
-    public List<PostDto> getPostDtosForGroup(Long groupId, Long currentUserId) {
-        List<UserPost> posts = userPostRepository.getAllByGroupIdOrderByDateDesc(groupId);
-        return enrichPostsWithAssociatedData(posts, currentUserId);
     }
 
     private List<PostDto> enrichPostsWithAssociatedData(List<UserPost> posts, Long currentUserId) {
@@ -129,11 +112,9 @@ public class UserPostServiceImpl implements UserPostService {
     }
 
     private void enrichWithLikeData(PostDto postDto, Long currentUserId) {
-        // Set like count
         Integer likeCount = postLikesService.getCountByPostId(postDto.getId());
         postDto.setLikeCount(likeCount);
 
-        // Set whether current user has liked this post
         if (currentUserId != null) {
             Boolean isLiked = postLikesService.existsByPostIdAndUserId(postDto.getId(), currentUserId);
             postDto.setIsLikedByCurrentUser(isLiked);
@@ -177,5 +158,13 @@ public class UserPostServiceImpl implements UserPostService {
         postDto.setComments(comments);
 
         postDto.setCommentCount(comments.size());
+    }
+
+    @Override
+    public void deleteAllPostsByGroupId(Long groupId) {
+        List<UserPost> groupPosts = userPostRepository.getAllByGroupIdOrderByDateDesc(groupId);
+        for (UserPost post : groupPosts) {
+            userPostRepository.deleteById(post.getId());
+        }
     }
 }

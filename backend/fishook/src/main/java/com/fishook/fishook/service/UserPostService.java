@@ -8,8 +8,6 @@ import java.util.List;
 public interface UserPostService {
     UserPost createUserPost(UserPost userPost);
 
-    List<UserPost> getAllUserPosts();
-
     List<PostDto> getAllUserFullPosts(Long userId);
 
     List<PostDto> getAllUserPostsByUserId(Long userId, Long currentUserId);
@@ -20,7 +18,5 @@ public interface UserPostService {
 
     PostDto getPostDtoById(Long postId, Long currentUserId);
 
-    List<PostDto> getPostDtosByUserId(Long userId, Long currentUserId);
-
-    List<PostDto> getPostDtosForGroup(Long groupId, Long currentUserId);
+    void deleteAllPostsByGroupId(Long groupId);
 }

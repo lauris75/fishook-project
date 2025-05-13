@@ -42,6 +42,18 @@
       background-color: #ffeded;
     }
   }
+
+  &.admin {
+    background-color: #f8f9fa;
+    
+    .dropdown-item-icon {
+      color: #5F9EA0;
+    }
+    
+    &:hover {
+      background-color: #e9ecef;
+    }
+  }
 }
 
 .dropdown-item-icon {

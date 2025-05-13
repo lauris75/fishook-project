@@ -72,6 +72,21 @@
             cursor: pointer;
             font-weight: bold;
           }
+
+          .admin-delete-btn {
+            background-color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            
+            &:hover {
+              background-color: #c0392b;
+            }
+            
+            svg {
+              font-size: 18px;
+            }
+          }
         }
       }
     }

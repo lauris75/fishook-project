@@ -5,17 +5,20 @@ import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SecurityIcon from "@mui/icons-material/Security";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState, useEffect, useContext, useRef } from "react";
 import { formatDistanceToNow } from 'date-fns';
 import { api } from "../../context/AuthContext";
 import { AuthContext } from "../../context/AuthContext";
+import { useAdmin } from "../../hooks/useAdmin";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import ConfirmationModal from "../confirmationModal/ConfirmationModal";
 
 const Post = ({ post, onPostDeleted }) => {
   const { currentUser } = useContext(AuthContext);
+  const { isAdmin } = useAdmin();
   const [commentOpen, setCommentOpen] = useState(false);
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
@@ -23,7 +26,8 @@ const Post = ({ post, onPostDeleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
-  const isOwnPost = post.userId === currentUser.id;
+  // Show options menu for owner or admin
+  const canManagePost = post.userId === currentUser.id || isAdmin;
   
   // Updated to sort newest-first
   const sortCommentsByDate = (commentsArray) => {
@@ -102,14 +106,20 @@ const Post = ({ post, onPostDeleted }) => {
     setMenuOpen(!menuOpen);
   };
   
+  // Create the options based on whether it's admin or owner deleting
   const moreOptions = [
     {
-      label: "Delete Post",
-      icon: <DeleteOutlineIcon fontSize="small" />,
+      label: isAdmin && post.userId !== currentUser.id ? "Delete Post (Admin)" : "Delete Post",
+      icon: isAdmin && post.userId !== currentUser.id ? <SecurityIcon fontSize="small" /> : <DeleteOutlineIcon fontSize="small" />,
       onClick: openDeleteModal,
       danger: true
     }
   ];
+  
+  // Different message for admin vs owner
+  const deleteMessage = isAdmin && post.userId !== currentUser.id
+    ? "As an admin, you are about to delete another user's post. This action cannot be undone."
+    : "Are you sure you want to delete this post? This action cannot be undone.";
   
   return (
     <div className="post">
@@ -129,7 +139,7 @@ const Post = ({ post, onPostDeleted }) => {
               <span className="date">{formattedDate}</span>
             </div>
           </div>
-          {isOwnPost && (
+          {canManagePost && (
             <div className="more-options" ref={moreOptionsRef}>
               <div onClick={toggleMenu}>
                 <MoreHorizIcon style={{ cursor: 'pointer' }} />
@@ -173,7 +183,7 @@ const Post = ({ post, onPostDeleted }) => {
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
         title="Delete Post"
-        message="Are you sure you want to delete this post? This action cannot be undone."
+        message={deleteMessage}
       />
     </div>
   );

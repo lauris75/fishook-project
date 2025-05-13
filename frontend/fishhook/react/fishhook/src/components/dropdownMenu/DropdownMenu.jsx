@@ -33,7 +33,7 @@ const DropdownMenu = ({ options, anchorEl, isOpen, setIsOpen }) => {
           {options.map((option, index) => (
             <div 
               key={index} 
-              className={`dropdown-item ${option.danger ? 'danger' : ''}`}
+              className={`dropdown-item ${option.danger ? 'danger' : ''} ${option.admin ? 'admin' : ''}`}
               onClick={() => handleOptionClick(option.onClick)}
             >
               {option.icon && <span className="dropdown-item-icon">{option.icon}</span>}

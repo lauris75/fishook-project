@@ -2,8 +2,11 @@ package com.fishook.fishook.controller;
 
 import com.fishook.fishook.config.SecurityService;
 import com.fishook.fishook.dto.PostDto;
+import com.fishook.fishook.entity.Role;
+import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.entity.UserPost;
 import com.fishook.fishook.service.UserPostService;
+import com.fishook.fishook.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,9 @@ public class UserPostController {
 
     @Autowired
     private UserPostService userPostService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<?> createUserPost(@RequestBody UserPost userPost) {
@@ -68,16 +74,20 @@ public class UserPostController {
     @DeleteMapping("/{userPostId}")
     public ResponseEntity<?> deleteUserPost(@PathVariable Long userPostId) {
         Long currentUserId = securityService.getCurrentUserId();
+        UserEntity currentUser = userService.getUserById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         PostDto postDto = userPostService.getPostDtoById(userPostId, currentUserId);
 
         if (postDto == null) {
             return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
         }
 
-        if (!currentUserId.equals(postDto.getUserId())) {
-            return new ResponseEntity<>("You can only delete your own posts", HttpStatus.FORBIDDEN);
+        if (currentUserId.equals(postDto.getUserId()) ||
+                currentUser.getRole() == Role.ADMIN) {
+            return new ResponseEntity<>(userPostService.deleteUserPost(userPostId), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("You can only delete your own posts or must be an admin", HttpStatus.FORBIDDEN);
         }
-
-        return new ResponseEntity<>(userPostService.deleteUserPost(userPostId), HttpStatus.OK);
     }
 }
