@@ -14,16 +14,50 @@
         font-size: 40px;
     }
     .center{
-        display: flex;
-        align-items: center;
-        input{
-            border: none;
+        position: relative;
+        flex: 1;
+        max-width: 500px;
+        margin: 0 20px;
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: white;
             border-radius: 10px;
-            overflow: hidden;
-            padding: 10px;
-            width: 350px;
-            margin-left: 10px;
-            font-size: 15px;
+            padding: 5px 10px;
+            width: 100%;
+            position: relative;
+            
+            .search-icon {
+                color: #666;
+                margin-right: 8px;
+            }
+            
+            input {
+                border: none;
+                flex: 1;
+                font-size: 15px;
+                width: 100%;
+                padding: 8px 0;
+                
+                &:focus {
+                    outline: none;
+                }
+            }
+            
+            .clear-button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #999;
+                display: flex;
+                align-items: center;
+                padding: 0;
+                
+                &:hover {
+                    color: #666;
+                }
+            }
         }
     }
     .right{
