@@ -1,8 +1,12 @@
-.posts{
+/* Add this to your Posts.scss file to ensure proper width */
+
+.posts {
   display: flex;
   flex-direction: column;
   gap: 50px;
-  padding: 20px 50px 20px 0px;
+  padding: 20px 0;
+  width: 100%;
+  box-sizing: border-box;
   
   .no-posts {
     background-color: white;
@@ -10,10 +14,17 @@
     padding: 30px;
     text-align: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
     
     p {
       font-size: 16px;
       color: #666;
     }
+  }
+  
+  /* Ensure any post content maintains full width */
+  > div {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

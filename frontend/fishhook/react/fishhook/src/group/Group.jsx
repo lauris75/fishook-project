@@ -1,5 +1,5 @@
 import "./Group.scss"
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useAdmin } from "../hooks/useAdmin";
@@ -8,6 +8,9 @@ import GroupUpdateForm from "../components/groupUpdateForm/GroupUpdateForm";
 import { api } from "../context/AuthContext";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import SecurityIcon from '@mui/icons-material/Security';
+import DropdownMenu from "../components/dropdownMenu/DropdownMenu";
 import ConfirmationModal from "../components/confirmationModal/ConfirmationModal";
 
 const Group = () => {
@@ -22,6 +25,8 @@ const Group = () => {
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const moreOptionsRef = useRef(null);
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -89,6 +94,27 @@ const Group = () => {
   const handleGroupUpdate = (updatedGroup) => {
     setGroup(updatedGroup);
   };
+  
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+  
+  // Create the options for dropdown menu
+  const createMoreOptions = () => {
+    const options = [];
+    
+    // Admin delete option
+    if (isAdmin && !isOwner) {
+      options.push({
+        label: "Delete Group (Admin)",
+        icon: <SecurityIcon fontSize="small" />,
+        onClick: () => setIsDeleteModalOpen(true),
+        danger: true
+      });
+    }
+    
+    return options;
+  };
 
   if (loading) return <div className="group">Loading group...</div>;
   if (error) return <div className="group">Error: {error}</div>;
@@ -125,28 +151,45 @@ const Group = () => {
             </div>
           </div>
           <div className="action">
-            {isOwner ? (
-              <button className="edit-group-btn" onClick={handleOpenUpdateForm}>
-                <EditIcon /> Update Group
-              </button>
-            ) : isAdmin ? (
-              <button 
-                className="admin-delete-btn"
-                onClick={() => setIsDeleteModalOpen(true)}
-              >
-                <DeleteOutlineIcon /> Delete Group
-              </button>
-            ) : (
-              <button onClick={handleJoinLeave}>
-                {isMember ? "Leave Group" : "Join Group"}
-              </button>
+            {/* Group action buttons with improved logic */}
+            <div className="action-buttons">
+              {isOwner && (
+                <button className="edit-group-btn" onClick={handleOpenUpdateForm}>
+                  <EditIcon /> Update Group
+                </button>
+              )}
+              
+              {/* Join/Leave button for non-owners (including admins) */}
+              {!isOwner && (
+                <button 
+                  className="join-leave-btn" 
+                  onClick={handleJoinLeave}
+                >
+                  {isMember ? "Leave Group" : "Join Group"}
+                </button>
+              )}
+            </div>
+            
+            {/* Admin options menu - positioned absolutely in top right */}
+            {isAdmin && !isOwner && (
+              <div className="more-options" ref={moreOptionsRef}>
+                <div onClick={toggleMenu}>
+                  <MoreHorizIcon style={{ cursor: 'pointer' }} />
+                </div>
+                <DropdownMenu 
+                  options={createMoreOptions()} 
+                  anchorEl={moreOptionsRef.current}
+                  isOpen={menuOpen}
+                  setIsOpen={setMenuOpen}
+                />
+              </div>
             )}
           </div>
         </div>
       </div>
       
       <h2 className="postsTitle">Group Posts</h2>
-      <div className="posts">
+      <div className="posts" style={{ width: '100%', boxSizing: 'border-box' }}>
         <Posts groupId={parseInt(id)} />
       </div>
 
