@@ -70,7 +70,6 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
       if (onPostDeleted) {
         onPostDeleted(post.id);
       } else {
-        // If no callback provided, we can show a success message or refresh the page
         window.location.reload();
       }
     } catch (error) {
@@ -80,12 +79,15 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
       closeDeleteModal();
     }
   };
+
+  const handleContactSeller = () => {
+    window.location.href = `/chat?seller=${post.userId}`;
+  };
   
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
   
-  // Create the options based on whether it's admin or owner deleting
   const moreOptions = [
     {
       label: isAdmin && post.userId !== currentUser.id ? "Delete Listing (Admin)" : "Delete Listing",
