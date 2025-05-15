@@ -161,8 +161,10 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
       </div>
       
       <div className="post-actions">
-        <button className="contact-button">
-          Contact Seller
+        <button 
+          className="contact-button"
+          onClick={() => window.location.href = `/chat?seller=${post.userId}`}>
+            Contact Seller
         </button>
       </div>
       
