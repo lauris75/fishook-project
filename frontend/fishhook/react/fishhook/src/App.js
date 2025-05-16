@@ -9,6 +9,7 @@ import Marketplace from './marketplace/Marketplace.jsx';
 import Chat from './chat/Chat.jsx';
 import Fish from './fish/Fish.jsx';
 import Lake from './lake/Lake.jsx';
+import Map from './map/Map.jsx';
 import UsefulInfo from './usefulInfo/UsefulInfo.jsx';
 import {
   createBrowserRouter,
@@ -77,6 +78,10 @@ function App() {
         {
           path:"/chat",
           element:<Chat/>
+        },
+        {
+          path:"/map",
+          element:<Map/>
         },
         {
           path:"/fish",

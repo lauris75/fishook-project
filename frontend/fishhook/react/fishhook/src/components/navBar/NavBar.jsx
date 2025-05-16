@@ -1,10 +1,10 @@
-// src/components/navBar/NavBar.jsx
 import "./NavBar.scss"
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import WaterOutlinedIcon from '@mui/icons-material/WaterOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import FishIcon from "../../assets/fish_icon.png";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
@@ -72,6 +72,14 @@ const NavBar = () => {
           <div className="item">
             <ChatOutlinedIcon style={{ fontSize: 60 }}/>
             <span>Chat</span>
+          </div>
+        </Link>
+        
+        {/* Moved Map link to the bottom */}
+        <Link to="/map" style={{ textDecoration: "none", color: "inherit" }}>
+          <div className="item">
+            <MapOutlinedIcon style={{ fontSize: 60 }}/>
+            <span>Map</span>
           </div>
         </Link>
       </div>
