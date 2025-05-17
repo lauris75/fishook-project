@@ -6,6 +6,7 @@ import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import SearchFilter from "../components/searchFilter/SearchFilter";
+import WeatherForecast from "../components/weatherForecast/WeatherForecast";
 
 // Fix for default marker icon in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -18,6 +19,14 @@ L.Icon.Default.mergeOptions({
   shadowSize: [41, 41]
 });
 
+// Custom fishing marker icon
+const fishingMarkerIcon = new L.Icon({
+  iconUrl: '/fishing-marker.svg', // SVG icon added to public folder
+  iconSize: [30, 45],
+  iconAnchor: [15, 45],
+  popupAnchor: [0, -40]
+});
+
 const Map = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -28,6 +37,7 @@ const Map = () => {
   const [error, setError] = useState(null);
   const [activeLocation, setActiveLocation] = useState(null);
   const [markersLayer, setMarkersLayer] = useState(null);
+  const [showWeather, setShowWeather] = useState(false);
 
   // Lithuania's center coordinates
   const lithuaniaCenter = [55.1694, 23.8813];
@@ -106,13 +116,16 @@ const Map = () => {
           const lng = parseFloat(lake.longitude);
           
           if (!isNaN(lat) && !isNaN(lng)) {
-            // Create marker without popup, just add click handler
-            const marker = L.marker([lat, lng])
-              .addTo(markersLayer);
+            // Create marker with fishing icon
+            const marker = L.marker([lat, lng], { 
+              icon: fishingMarkerIcon 
+            }).addTo(markersLayer);
               
             // Add click handler to show side panel
             marker.on('click', () => {
               setActiveLocation(lake);
+              // Reset weather visibility when a new lake is selected
+              setShowWeather(false);
               
               // Pan map to center on the clicked marker
               if (mapInstanceRef.current) {
@@ -126,6 +139,11 @@ const Map = () => {
       });
     }
   }, [filteredLakes, markersLayer]);
+
+  // Toggle weather forecast display
+  const toggleWeather = () => {
+    setShowWeather(!showWeather);
+  };
 
   return (
     <div className="map-page full-width">
@@ -177,12 +195,28 @@ const Map = () => {
                   <div>Longitude: {activeLocation.longitude}</div>
                 </div>
                 
-                <a 
-                  href={`/lake/${activeLocation.id}`} 
-                  className="view-details-btn"
-                >
-                  View Full Details
-                </a>
+                <div className="panel-actions">
+                  <button 
+                    className={`weather-toggle-btn ${showWeather ? 'active' : ''}`}
+                    onClick={toggleWeather}
+                  >
+                    {showWeather ? 'Hide Weather' : 'Show Weather Forecast'}
+                  </button>
+                  
+                  <a 
+                    href={`/lake/${activeLocation.id}`} 
+                    className="view-details-btn"
+                  >
+                    View Full Details
+                  </a>
+                </div>
+                
+                {showWeather && (
+                  <WeatherForecast 
+                    latitude={parseFloat(activeLocation.latitude)} 
+                    longitude={parseFloat(activeLocation.longitude)} 
+                  />
+                )}
               </div>
             </div>
           )}

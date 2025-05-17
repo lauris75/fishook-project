@@ -80,13 +80,33 @@
         position: absolute;
         top: 20px;
         right: 20px;
-        width: 320px;
+        width: 350px; /* Increased width to accommodate weather info */
         max-width: calc(100% - 40px);
         background-color: white;
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         overflow: hidden;
         z-index: 1000;
+        max-height: calc(100vh - 260px);
+        overflow-y: auto;
+        
+        /* Scrollbar styling */
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: #ddd;
+          border-radius: 6px;
+          
+          &:hover {
+            background: #ccc;
+          }
+        }
         
         .panel-header {
           display: flex;
@@ -95,6 +115,9 @@
           padding: 15px;
           background-color: #5F9EA0;
           color: white;
+          position: sticky;
+          top: 0;
+          z-index: 1;
           
           h2 {
             margin: 0;
@@ -144,19 +167,48 @@
             margin-bottom: 15px;
           }
           
-          .view-details-btn {
-            display: block;
-            text-align: center;
-            background-color: #5F9EA0;
-            color: white;
-            padding: 10px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: background-color 0.2s;
+          .panel-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
             
-            &:hover {
-              background-color: darken(#5F9EA0, 10%);
+            .weather-toggle-btn {
+              flex: 1;
+              background-color: #f0f0f0;
+              color: #555;
+              border: 1px solid #ddd;
+              padding: 10px;
+              border-radius: 5px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: background-color 0.2s;
+              
+              &:hover {
+                background-color: #e0e0e0;
+              }
+              
+              &.active {
+                background-color: #e6f7f8;
+                border-color: #5F9EA0;
+                color: #5F9EA0;
+              }
+            }
+            
+            .view-details-btn {
+              flex: 1;
+              display: block;
+              text-align: center;
+              background-color: #5F9EA0;
+              color: white;
+              padding: 10px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: 500;
+              transition: background-color 0.2s;
+              
+              &:hover {
+                background-color: darken(#5F9EA0, 10%);
+              }
             }
           }
         }
