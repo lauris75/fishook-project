@@ -106,19 +106,18 @@ const Map = () => {
           const lng = parseFloat(lake.longitude);
           
           if (!isNaN(lat) && !isNaN(lng)) {
+            // Create marker without popup, just add click handler
             const marker = L.marker([lat, lng])
-              .addTo(markersLayer)
-              .bindPopup(`
-                <div class="lake-popup">
-                  <h3>${lake.name}</h3>
-                  <p>${lake.summary.substring(0, 100)}...</p>
-                  <a href="/lake/${lake.id}" class="view-lake-btn">View Details</a>
-                </div>
-              `);
+              .addTo(markersLayer);
               
-            // Add click handler
+            // Add click handler to show side panel
             marker.on('click', () => {
               setActiveLocation(lake);
+              
+              // Pan map to center on the clicked marker
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.panTo([lat, lng]);
+              }
             });
           }
         } catch (error) {
