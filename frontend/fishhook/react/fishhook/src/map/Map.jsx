@@ -128,7 +128,7 @@ const Map = () => {
   }, [filteredLakes, markersLayer]);
 
   return (
-    <div className="map-page">
+    <div className="map-page full-width">
       <div className="map-container">
         <div className="map-header">
           <h1>Fishing Map</h1>

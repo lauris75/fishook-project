@@ -1,11 +1,28 @@
 .map-page {
   padding: 20px;
   
+  &.full-width {
+    padding: 20px 0; /* Remove horizontal padding */
+    max-width: 100%; /* Take full width */
+    
+    .map-container {
+      margin: 0;
+      max-width: none;
+      border-radius: 0; /* Remove rounded corners for full-width view */
+      box-shadow: none; /* Remove shadow for full-width view */
+    }
+
+    .map-header {
+      padding: 20px;
+    }
+  }
+  
   .map-container {
     background-color: white;
     border-radius: 15px;
     box-shadow: 0px 0px 15px -5px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    margin: 0 auto;
     
     .map-header {
       padding: 20px;
