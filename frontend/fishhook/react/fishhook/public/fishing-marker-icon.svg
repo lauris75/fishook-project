@@ -1,22 +1,27 @@
-<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
   <!-- Map Pin Body -->
-  <path d="M50 0 C22.4 0 0 22.4 0 50 C0 88 50 120 50 120 C50 120 100 88 100 50 C100 22.4 77.6 0 50 0 Z" fill="#5F9EA0" />
+  <path d="M50 0 C22.4 0 0 22.4 0 50 C0 88 50 120 50 120 C50 120 100 88 100 50 C100 22.4 77.6 0 50 0 Z" fill="#5F9EA0" stroke="#478e90" stroke-width="2" />
   
-  <!-- Fish Icon -->
-  <g transform="translate(25, 30) scale(0.5)">
-    <!-- Fish Body -->
-    <path d="M90,40 C70,20 25,20 10,40 C25,60 70,60 90,40 Z" fill="white" />
+  <!-- Light Blue Circle - 20% bigger (radius increased from 32 to 38.4) -->
+  <circle cx="50" cy="50" r="38.4" fill="#B8E0E2" opacity="0.95" />
+  
+  <!-- Fish Icon - Same position and scale as before -->
+  <g transform="translate(18, 25) scale(0.65)">
+    <!-- Fish Body with Outline -->
+    <path d="M90,40 C70,20 25,20 10,40 C25,60 70,60 90,40 Z" fill="#1a4b4d" stroke="#0e3133" stroke-width="1.5" />
     
     <!-- Fish Eye -->
-    <circle cx="75" cy="40" r="5" fill="#333" />
+    <circle cx="75" cy="40" r="5" fill="white" stroke="#0e3133" stroke-width="1" />
     
     <!-- Fish Tail -->
-    <path d="M10,40 L0,25 L5,40 L0,55 Z" fill="white" />
+    <path d="M10,40 L0,25 L5,40 L0,55 Z" fill="#1a4b4d" stroke="#0e3133" stroke-width="1.5" />
     
     <!-- Fish Fin -->
-    <path d="M50,25 C45,33 55,33 50,25 Z" fill="white" />
+    <path d="M50,25 C45,33 55,33 50,25 Z" fill="#1a4b4d" stroke="#0e3133" stroke-width="1" />
+
+    <!-- Fish Details -->
+    <path d="M50,40 C55,45 60,40 55,35" fill="none" stroke="#0e3133" stroke-width="2" />
+    <path d="M40,40 C45,45 50,40 45,35" fill="none" stroke="#0e3133" stroke-width="2" />
+    <path d="M30,40 C35,45 40,40 35,35" fill="none" stroke="#0e3133" stroke-width="2" />
   </g>
-  
-  <!-- White Circle Inside Pin -->
-  <circle cx="50" cy="45" r="30" fill="#ffffff" opacity="0.3" />
 </svg>

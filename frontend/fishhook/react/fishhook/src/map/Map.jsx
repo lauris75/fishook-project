@@ -19,14 +19,6 @@ L.Icon.Default.mergeOptions({
   shadowSize: [41, 41]
 });
 
-// Custom fishing marker icon
-const fishingMarkerIcon = new L.Icon({
-  iconUrl: '/fishing-marker.svg', // SVG icon added to public folder
-  iconSize: [30, 45],
-  iconAnchor: [15, 45],
-  popupAnchor: [0, -40]
-});
-
 const Map = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -117,9 +109,7 @@ const Map = () => {
           
           if (!isNaN(lat) && !isNaN(lng)) {
             // Create marker with fishing icon
-            const marker = L.marker([lat, lng], { 
-              icon: fishingMarkerIcon 
-            }).addTo(markersLayer);
+            const marker = L.marker([lat, lng]).addTo(markersLayer);
               
             // Add click handler to show side panel
             marker.on('click', () => {
