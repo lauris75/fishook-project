@@ -259,8 +259,10 @@ const WeatherForecast = ({ latitude, longitude }) => {
             alt={weather.description} 
             className="weather-icon" 
           />
-          <div className="weather-temp">{temp}°C</div>
-          <div className="weather-desc">{weather.description}</div>
+          <div className="weather-info">
+            <div className="weather-temp">{temp}°C</div>
+            <div className="weather-desc">{weather.description}</div>
+          </div>
         </div>
         
         <div className="weather-details">
