@@ -4,7 +4,7 @@ import axios from "axios";
 export const AuthContext = createContext();
 
 export const api = axios.create({
-  baseURL: "http://localhost:8081",
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 10000,
 });
 

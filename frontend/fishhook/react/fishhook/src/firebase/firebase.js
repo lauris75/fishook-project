@@ -1,15 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
-// Your web app's Firebase configuration
-// Replace with your actual Firebase config values
 const firebaseConfig = {
-  apiKey: "AIzaSyA7HjYbDb7ux6aYHhZyE5H22eO6HM1cFuQ",
-  authDomain: "fishhook-6fbbc.firebaseapp.com",
-  projectId: "fishhook-6fbbc",
-  storageBucket: "fishhook-6fbbc.firebasestorage.app",
-  messagingSenderId: "756196258749",
-  appId: "1:756196258749:web:660583deded0b269aa18d4"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

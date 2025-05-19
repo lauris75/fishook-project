@@ -10,8 +10,7 @@ import NavigationIcon from '@mui/icons-material/Navigation';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-// Replace with your actual API key when implementing
-const OPENWEATHER_API_KEY = "ba25ed73eef03334a531bf4c5c3ba7bd";
+const OPENWEATHER_API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
 
 const WeatherForecast = ({ latitude, longitude }) => {
   const [forecast, setForecast] = useState(null);
