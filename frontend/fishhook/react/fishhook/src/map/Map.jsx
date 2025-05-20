@@ -26,6 +26,7 @@ const Map = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredLakes, setFilteredLakes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [error, setError] = useState(null);
   const [activeLocation, setActiveLocation] = useState(null);
   const [markersLayer, setMarkersLayer] = useState(null);
@@ -59,13 +60,52 @@ const Map = () => {
     };
   }, []);
 
-  // Fetch lakes data
+  // Fetch all lakes data with progress tracking
   useEffect(() => {
-    const fetchLakes = async () => {
+    const fetchAllLakes = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
-        const response = await api.get("/lake");
-        setLakes(response.data);
-        setFilteredLakes(response.data);
+        // Initial estimate of total lakes (will be refined as we fetch)
+        let estimatedTotal = 100;
+        setLoadingProgress({ current: 0, total: estimatedTotal });
+        
+        let allLakes = [];
+        let offset = 0;
+        const limit = 50; // Fetch in batches of 50
+        let hasMore = true;
+        
+        // Continue fetching batches until we've got all lakes
+        while (hasMore) {
+          const response = await api.get("/lake", {
+            params: { offset, limit }
+          });
+          
+          const batch = response.data;
+          
+          if (batch && batch.length > 0) {
+            // Add lakes to our collection
+            allLakes = [...allLakes, ...batch];
+            
+            // Update progress
+            offset += batch.length;
+            setLoadingProgress({ 
+              current: allLakes.length, 
+              total: Math.max(estimatedTotal, allLakes.length + (batch.length === limit ? limit : 0))
+            });
+            
+            // Determine if there are more lakes to fetch
+            hasMore = batch.length === limit;
+          } else {
+            hasMore = false;
+          }
+        }
+        
+        // Update final states
+        setLakes(allLakes);
+        setFilteredLakes(allLakes);
+        setLoadingProgress({ current: allLakes.length, total: allLakes.length });
         setLoading(false);
       } catch (err) {
         console.error("Error fetching lakes:", err);
@@ -74,7 +114,7 @@ const Map = () => {
       }
     };
 
-    fetchLakes();
+    fetchAllLakes();
   }, []);
 
   // Filter lakes based on search
@@ -110,7 +150,7 @@ const Map = () => {
           if (!isNaN(lat) && !isNaN(lng)) {
             // Create marker with fishing icon
             const marker = L.marker([lat, lng]).addTo(markersLayer);
-              
+            
             // Add click handler to show side panel
             marker.on('click', () => {
               setActiveLocation(lake);
@@ -151,12 +191,26 @@ const Map = () => {
           </div>
 
           {loading ? (
-            <div className="loading">Loading map data...</div>
+            <div className="loading">
+              <div className="loading-progress">
+                <div className="progress-bar">
+                  <div 
+                    className="progress" 
+                    style={{ width: `${(loadingProgress.current / loadingProgress.total) * 100}%` }}
+                  ></div>
+                </div>
+                <span>
+                  Loading lakes: {loadingProgress.current} / {loadingProgress.total}
+                  {loadingProgress.current < loadingProgress.total ? "..." : " complete!"}
+                </span>
+              </div>
+            </div>
           ) : error ? (
             <div className="error">{error}</div>
           ) : (
             <div className="lakes-count">
               Showing {filteredLakes.length} of {lakes.length} lakes
+              {searchQuery && <span> matching "{searchQuery}"</span>}
             </div>
           )}
         </div>
@@ -183,6 +237,8 @@ const Map = () => {
                 <div className="lake-coords">
                   <div>Latitude: {activeLocation.latitude}</div>
                   <div>Longitude: {activeLocation.longitude}</div>
+                  {activeLocation.area && <div>Area: {activeLocation.area} sq ha</div>}
+                  {activeLocation.coastlineLength && <div>Coastline: {activeLocation.coastlineLength} km</div>}
                 </div>
                 
                 <div className="panel-actions">
