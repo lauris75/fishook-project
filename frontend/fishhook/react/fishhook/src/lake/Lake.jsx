@@ -4,6 +4,7 @@ import { api } from "../context/AuthContext";
 import { useAdmin } from "../hooks/useAdmin";
 import InfoCard from "../components/infoCard/InfoCard";
 import SearchIcon from '@mui/icons-material/Search';
+import SearchFilter from "../components/searchFilter/SearchFilter"; // Added missing import
 import LakeEditButton from "../components/lakeEditButton/LakeEditButton";
 import LakeFishManager from "../components/lakeFishManager/LakeFishManager";
 import "./Lake.scss";
