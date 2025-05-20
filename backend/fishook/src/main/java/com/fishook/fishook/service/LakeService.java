@@ -23,4 +23,8 @@ public interface LakeService {
     Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest);
 
     String deleteLake(Long lakeId);
+
+    List<Lake> getAllLakesBatch(int offset, int limit);
+
+    List<Lake> searchLakesBatch(String query, int offset, int limit);
 }

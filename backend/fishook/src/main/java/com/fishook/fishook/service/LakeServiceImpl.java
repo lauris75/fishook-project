@@ -4,6 +4,9 @@ import com.fishook.fishook.dto.LakeUpdateRequest;
 import com.fishook.fishook.entity.Lake;
 import com.fishook.fishook.entity.LakeFish;
 import com.fishook.fishook.repository.LakeRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,9 @@ public class LakeServiceImpl implements LakeService {
     private final LakeRepository lakeRepository;
     private final LakeFishService lakeFishService;
     private final FishService fishService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public LakeServiceImpl(
             LakeRepository lakeRepository,
@@ -37,6 +43,33 @@ public class LakeServiceImpl implements LakeService {
     @Override
     public List<Lake> getAllLakes() {
         return lakeRepository.findAll();
+    }
+
+    @Override
+    public List<Lake> getAllLakesBatch(int offset, int limit) {
+        Query query = entityManager.createQuery("SELECT l FROM Lake l ORDER BY l.name ASC");
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Lake> searchLakesBatch(String searchQuery, int offset, int limit) {
+        String searchTerm = "%" + searchQuery.toLowerCase() + "%";
+
+        Query query = entityManager.createQuery(
+                "SELECT l FROM Lake l WHERE " +
+                        "LOWER(l.name) LIKE :searchTerm OR " +
+                        "LOWER(l.summary) LIKE :searchTerm OR " +
+                        "LOWER(l.latitude) LIKE :searchTerm OR " +
+                        "LOWER(l.longitude) LIKE :searchTerm " +
+                        "ORDER BY l.name ASC");
+
+        query.setParameter("searchTerm", searchTerm);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        return query.getResultList();
     }
 
     @Override
@@ -89,7 +122,6 @@ public class LakeServiceImpl implements LakeService {
         lakeFishService.deleteLakeFishByLakeIdAndFishId(lakeId, fishId);
     }
 
-    // In LakeServiceImpl.java, update the updateLake method
     @Override
     @Transactional
     public Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest) {

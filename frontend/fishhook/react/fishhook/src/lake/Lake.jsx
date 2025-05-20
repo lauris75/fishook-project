@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../context/AuthContext";
 import { useAdmin } from "../hooks/useAdmin";
@@ -13,41 +13,64 @@ const Lake = () => {
   const { isAdmin } = useAdmin();
   const [lakeData, setLakeData] = useState(null);
   const [relatedFish, setRelatedFish] = useState([]);
-  const [allLakes, setAllLakes] = useState([]);
+  const [lakes, setLakes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredLakes, setFilteredLakes] = useState([]);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 20; // Number of lakes to load at once
+  
+  const observer = useRef();
+  const searchTimeout = useRef(null);
 
-  // Fetch data based on whether we're viewing a list or a single lake
+  // Handle search query debounce
+  useEffect(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    
+    searchTimeout.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      // Reset when search changes
+      setLakes([]);
+      setOffset(0);
+      setHasMore(true);
+    }, 500); // 500ms debounce
+    
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // Fetch data for single lake or lake list
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
-          // Get lake with related fish
+          // Single lake view - unchanged
           const response = await api.get(`/lake/${id}/withFish`);
           setLakeData(response.data);
           
-          // If lake has fishes property and it's an array
           if (response.data.fishes && Array.isArray(response.data.fishes)) {
-            // Sort fish alphabetically by name
             const sortedFish = [...response.data.fishes].sort((a, b) => 
               a.name.localeCompare(b.name)
             );
             setRelatedFish(sortedFish);
           } else {
-            // Alternatively fetch lake-fish associations
             try {
               const lakeFishResponse = await api.get(`/lakeFish/lake/${id}`);
               if (lakeFishResponse.data && lakeFishResponse.data.length > 0) {
-                // Get fish details for each association
                 const fishPromises = lakeFishResponse.data.map(lakeFish => 
                   api.get(`/fish/${lakeFish.fishId}`)
                 );
                 const fishResponses = await Promise.all(fishPromises);
                 const fishList = fishResponses.map(res => res.data);
                 
-                // Sort fish alphabetically by name
                 const sortedFish = [...fishList].sort((a, b) => 
                   a.name.localeCompare(b.name)
                 );
@@ -57,41 +80,64 @@ const Lake = () => {
               console.error("Error fetching lake-fish associations:", lakeFishErr);
             }
           }
-        } else {
-          // Fetch all lakes for the list view
-          const response = await api.get("/lake");
-          setAllLakes(response.data);
-          setFilteredLakes(response.data);
+          setLoading(false);
+        } else if (hasMore && !loadingMore) {
+          // Only fetch more if we aren't already loading and there are more to load
+          setLoadingMore(true);
+          
+          // Use the original lake endpoint but modify the implementation to add "load more" functionality
+          let endpoint = "/lake";
+          let params = {};
+          
+          // Add search functionality
+          if (debouncedSearchQuery) {
+            endpoint = "/lake/search";
+            params = { query: debouncedSearchQuery, offset, limit: LIMIT };
+          } else {
+            params = { offset, limit: LIMIT };
+          }
+          
+          const response = await api.get(endpoint, { params });
+          
+          const newLakes = response.data.lakes || response.data;
+          
+          // If we got fewer lakes than the limit, there are no more to load
+          if (newLakes.length < LIMIT) {
+            setHasMore(false);
+          }
+          
+          // Append new lakes to existing ones
+          setLakes(prev => [...prev, ...newLakes]);
+          setLoadingMore(false);
+          setLoading(false);
         }
-        setLoading(false);
       } catch (err) {
+        console.error("Error fetching lake data:", err);
         setError(err.message || "Failed to fetch lake information");
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, offset, debouncedSearchQuery, hasMore, loadingMore]);
 
-  // Filter lakes based on search query (only for list view)
-  useEffect(() => {
-    if (!id && searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      const filtered = allLakes.filter(
-        lake =>
-          lake.name.toLowerCase().includes(query) ||
-          lake.summary.toLowerCase().includes(query) ||
-          lake.latitude.toLowerCase().includes(query) ||
-          lake.longitude.toLowerCase().includes(query)
-      );
-      setFilteredLakes(filtered);
-    } else if (!id) {
-      setFilteredLakes(allLakes);
-    }
-  }, [searchQuery, allLakes, id]);
+  // Intersection Observer setup for infinite scrolling
+  const lastLakeElementRef = useCallback(node => {
+    if (loading || loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setOffset(prevOffset => prevOffset + LIMIT);
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [loading, loadingMore, hasMore]);
 
+  // Handle lake update from admin
   const handleLakeUpdated = (updatedLake) => {
-    // Update the lake data while preserving fishes data
     setLakeData(prev => ({
       ...prev,
       name: updatedLake.name,
@@ -105,20 +151,16 @@ const Lake = () => {
   // Handle fish associations changes
   const handleAssociationsChanged = (action, changedFish) => {
     if (action === 'add') {
-      // Add the new fish to the related fish list
       setRelatedFish(prev => {
         const updated = [...prev, changedFish];
-        // Sort alphabetically
         return updated.sort((a, b) => a.name.localeCompare(b.name));
       });
     } else if (action === 'remove') {
-      // Remove the fish from the related fish list
       setRelatedFish(prev => 
         prev.filter(fish => fish.id !== changedFish.id)
       );
     }
     
-    // Also update the lake data to reflect the change
     setLakeData(prev => {
       if (!prev.fishes) {
         prev.fishes = [];
@@ -141,8 +183,20 @@ const Lake = () => {
     });
   };
 
-  if (loading) return <div className="lake-page">Loading lake information...</div>;
-  if (error) return <div className="lake-page">Error: {error}</div>;
+  if (loading && lakes.length === 0) {
+    return (
+      <div className="lake-page">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading lakes data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && lakes.length === 0) {
+    return <div className="lake-page">Error: {error}</div>;
+  }
 
   // Detail view (single lake)
   if (id && lakeData) {
@@ -199,7 +253,7 @@ const Lake = () => {
     );
   }
 
-  // List view (all lakes)
+  // List view (all lakes with infinite scrolling)
   return (
     <div className="lake-page list-view">
       <h1>Fishing Lakes</h1>
@@ -211,29 +265,67 @@ const Lake = () => {
         placeholder="Search lakes by name, location or description..."
       />
       
-      {filteredLakes.length === 0 ? (
+      {lakes.length === 0 && !loadingMore ? (
         <div className="no-results">
-          <p>No lakes found matching "{searchQuery}"</p>
+          <p>No lakes found matching "{debouncedSearchQuery}"</p>
           <button onClick={() => setSearchQuery("")}>Clear search</button>
         </div>
       ) : (
         <div className="lake-grid">
-          {filteredLakes.map((lake) => (
-            <div className="lake-card" key={lake.id} onClick={() => window.location.href = `/lake/${lake.id}`}>
-              <div className="lake-image">
-                <img src={lake.photoURL} alt={lake.name} />
-              </div>
-              <div className="lake-info">
-                <h3>{lake.name}</h3>
-                <p>{lake.summary.substring(0, 100)}...</p>
-                <div className="lake-coords">
-                  <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
-                  {lake.area && <span> • Area: {lake.area} sq ha</span>}
-                  {lake.coastlineLength && <span> • Coastline: {lake.coastlineLength} km</span>}
+          {lakes.map((lake, index) => {
+            // Add ref to last item for infinite scrolling
+            if (lakes.length === index + 1) {
+              return (
+                <div 
+                  ref={lastLakeElementRef}
+                  className="lake-card" 
+                  key={lake.id} 
+                  onClick={() => window.location.href = `/lake/${lake.id}`}
+                >
+                  <div className="lake-image">
+                    <img src={lake.photoURL} alt={lake.name} />
+                  </div>
+                  <div className="lake-info">
+                    <h3>{lake.name}</h3>
+                    <p>{lake.summary.substring(0, 100)}...</p>
+                    <div className="lake-coords">
+                      <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
+                      {lake.area && <span> • Area: {lake.area} sq ha</span>}
+                      {lake.coastlineLength && <span> • Coastline: {lake.coastlineLength} km</span>}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              );
+            } else {
+              return (
+                <div 
+                  className="lake-card" 
+                  key={lake.id} 
+                  onClick={() => window.location.href = `/lake/${lake.id}`}
+                >
+                  <div className="lake-image">
+                    <img src={lake.photoURL} alt={lake.name} />
+                  </div>
+                  <div className="lake-info">
+                    <h3>{lake.name}</h3>
+                    <p>{lake.summary.substring(0, 100)}...</p>
+                    <div className="lake-coords">
+                      <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
+                      {lake.area && <span> • Area: {lake.area} sq ha</span>}
+                      {lake.coastlineLength && <span> • Coastline: {lake.coastlineLength} km</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+          })}
+        </div>
+      )}
+      
+      {loadingMore && (
+        <div className="loading-more">
+          <div className="loading-spinner"></div>
+          <p>Loading more lakes...</p>
         </div>
       )}
     </div>

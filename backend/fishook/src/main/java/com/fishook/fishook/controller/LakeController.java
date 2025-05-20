@@ -35,10 +35,48 @@ public class LakeController {
     public ResponseEntity<?> createLake(@RequestBody Lake lake) {
         return new ResponseEntity<>(lakeService.createLake(lake), HttpStatus.CREATED);
     }
-
+    
     @GetMapping
-    public List<Lake> getAllLakes() {
-        return lakeService.getAllLakes().stream().map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(), p.getPhotoURL(), p.getLatitude(), p.getLongitude(), p.getArea(), p.getCoastlineLength(), null)).collect(Collectors.toList());
+    public ResponseEntity<List<Lake>> getAllLakes(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit) {
+
+        try {
+            List<Lake> lakes = lakeService.getAllLakesBatch(offset, limit);
+
+            // Map to DTOs without related entities
+            List<Lake> lakeDtos = lakes.stream()
+                    .map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(),
+                            p.getPhotoURL(), p.getLatitude(), p.getLongitude(), p.getArea(),
+                            p.getCoastlineLength(), null))
+                    .collect(Collectors.toList());
+
+            return new ResponseEntity<>(lakeDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Lake>> searchLakes(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit) {
+
+        try {
+            List<Lake> lakes = lakeService.searchLakesBatch(query, offset, limit);
+
+            // Map to DTOs without related entities
+            List<Lake> lakeDtos = lakes.stream()
+                    .map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(),
+                            p.getPhotoURL(), p.getLatitude(), p.getLongitude(), p.getArea(),
+                            p.getCoastlineLength(), null))
+                    .collect(Collectors.toList());
+
+            return new ResponseEntity<>(lakeDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{lakeId}")
