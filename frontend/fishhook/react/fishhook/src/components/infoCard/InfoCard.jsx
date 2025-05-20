@@ -29,6 +29,9 @@ const InfoCard = ({ image, title, name, summary, description, coords, area, coas
         <div className="description-content">
           {description}
         </div>
+        <div className="data-attribution">
+          Lake data source: UETK
+        </div>
       </div>
     </div>
   );
