@@ -15,4 +15,6 @@ public class LakeUpdateRequest {
     private String description;
     private String latitude;
     private String longitude;
+    private Double area;
+    private Double coastlineLength;
 }

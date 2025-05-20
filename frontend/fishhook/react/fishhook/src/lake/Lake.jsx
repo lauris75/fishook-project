@@ -158,6 +158,8 @@ const Lake = () => {
             latitude: lakeData.latitude,
             longitude: lakeData.longitude
           }}
+          area={lakeData.area}
+          coastlineLength={lakeData.coastlineLength}
         />
         
         {/* Admin Buttons */}
@@ -226,6 +228,8 @@ const Lake = () => {
                 <p>{lake.summary.substring(0, 100)}...</p>
                 <div className="lake-coords">
                   <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
+                  {lake.area && <span> • Area: {lake.area} sq ha</span>}
+                  {lake.coastlineLength && <span> • Coastline: {lake.coastlineLength} km</span>}
                 </div>
               </div>
             </div>

@@ -89,6 +89,7 @@ public class LakeServiceImpl implements LakeService {
         lakeFishService.deleteLakeFishByLakeIdAndFishId(lakeId, fishId);
     }
 
+    // In LakeServiceImpl.java, update the updateLake method
     @Override
     @Transactional
     public Lake updateLake(Long lakeId, LakeUpdateRequest updateRequest) {
@@ -113,6 +114,14 @@ public class LakeServiceImpl implements LakeService {
 
         if (updateRequest.getLongitude() != null && !updateRequest.getLongitude().isEmpty()) {
             lake.setLongitude(updateRequest.getLongitude());
+        }
+
+        if (updateRequest.getArea() != null) {
+            lake.setArea(updateRequest.getArea());
+        }
+
+        if (updateRequest.getCoastlineLength() != null) {
+            lake.setCoastlineLength(updateRequest.getCoastlineLength());
         }
 
         return lakeRepository.save(lake);

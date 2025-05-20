@@ -1,7 +1,7 @@
 import React from 'react';
 import "./InfoCard.scss";
 
-const InfoCard = ({ image, title, name, summary, description, coords }) => {
+const InfoCard = ({ image, title, name, summary, description, coords, area, coastlineLength }) => {
   return (
     <div className="info-card">
       <div className="info-image">
@@ -18,6 +18,8 @@ const InfoCard = ({ image, title, name, summary, description, coords }) => {
           <div className="info-coords">
             <span>Latitude: {coords.latitude}</span>
             <span>Longitude: {coords.longitude}</span>
+            {area && <span>Area: {area} sq ha</span>}
+            {coastlineLength && <span>Coastline: {coastlineLength} km</span>}
           </div>
         )}
       </div>

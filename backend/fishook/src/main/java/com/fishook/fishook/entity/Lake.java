@@ -38,6 +38,12 @@ public class Lake {
     @Column(name = "longitude", length = 30, nullable = false)
     private String longitude;
 
+    @Column(name = "area", nullable = true)
+    private Double area;
+
+    @Column(name = "coastlineLength", nullable = true)
+    private Double coastlineLength;
+
     @Transient
     private List<Fish> fishes;
 }
