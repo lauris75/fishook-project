@@ -14,19 +14,15 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Fetch all marketplace posts and categories
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
-        // Fetch marketplace posts
         const postsResponse = await api.get("/market");
         setMarketPosts(postsResponse.data);
         setFilteredPosts(postsResponse.data);
         
-        // Fetch categories
         const categoriesResponse = await api.get("/category");
         
-        // Transform categories for the dropdown
         const categoryOptions = categoriesResponse.data.map(category => ({
           value: category.id.toString(),
           label: category.name
@@ -44,16 +40,13 @@ const Marketplace = () => {
     fetchMarketData();
   }, []);
   
-  // Filter posts based on category and search query
   useEffect(() => {
     let filtered = marketPosts;
     
-    // Apply category filter
     if (selectedCategory !== "all") {
       filtered = filtered.filter(post => post.categoryId.toString() === selectedCategory);
     }
     
-    // Apply search filter
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(post => 
@@ -65,16 +58,13 @@ const Marketplace = () => {
   }, [selectedCategory, searchQuery, marketPosts]);
   
   const handlePostCreated = (newPost) => {
-    // Add the new post to the list and update filtered posts
     setMarketPosts(prevPosts => [newPost, ...prevPosts]);
     
-    // Reset filters when a new post is created
     setSearchQuery("");
     setSelectedCategory("all");
   };
   
   const handlePostDeleted = (postId) => {
-    // Remove the deleted post from both marketPosts and filteredPosts
     setMarketPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
     setFilteredPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
   };
@@ -91,13 +81,11 @@ const Marketplace = () => {
       <h1>Fishing Gear Marketplace</h1>
       <p className="marketplace-description">Buy and sell fishing equipment, boats, and accessories</p>
       
-      {/* Post creation form */}
       <MarketPostForm 
         categories={categories} 
         onPostCreated={handlePostCreated} 
       />
       
-      {/* Search and filter */}
       <div className="filter-container">
         <SearchFilter 
           searchQuery={searchQuery}
@@ -109,7 +97,6 @@ const Marketplace = () => {
         />
       </div>
       
-      {/* Market post listings */}
       {filteredPosts.length === 0 ? (
         <div className="no-posts">
           <p>No marketplace listings found</p>

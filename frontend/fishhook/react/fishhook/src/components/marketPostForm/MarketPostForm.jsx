@@ -23,7 +23,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
 
   const handlePriceChange = (e) => {
     const value = e.target.value;
-    // Allow only numbers and decimals
     if (/^\d*\.?\d*$/.test(value) || value === "") {
       setPrice(value);
     }
@@ -43,7 +42,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Form validation
     if (!content.trim()) {
       setError("Please provide a description for your listing");
       return;
@@ -65,24 +63,19 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
     try {
       let finalImageUrl = null;
       
-      // Upload image to Firebase if there is one
       if (image) {
         const storageRef = ref(storage, `marketplace/${currentUser.id}/${uuidv4()}`);
         
-        // Create the file metadata
         const metadata = {
           contentType: image.type,
         };
         
-        // Upload file and metadata
         const uploadTask = uploadBytesResumable(storageRef, image, metadata);
         
-        // Listen for state changes, errors, and completion
         await new Promise((resolve, reject) => {
           uploadTask.on(
             'state_changed', 
             (snapshot) => {
-              // Update progress
               const progress = Math.round(
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100
               );
@@ -93,7 +86,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
               reject(error);
             },
             async () => {
-              // Upload completed, get download URL
               try {
                 finalImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
                 resolve();
@@ -106,7 +98,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
         });
       }
       
-      // Create market post data
       const marketPostData = {
         userId: currentUser.id,
         content: content,
@@ -119,7 +110,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
       const response = await api.post('/market', marketPostData);
       
       if (response.status === 201) {
-        // Clear form after successful submission
         setContent("");
         setPrice("");
         setCategoryId("");
@@ -128,7 +118,6 @@ const MarketPostForm = ({ categories, onPostCreated }) => {
         setUploadProgress(0);
         setIsFormVisible(false);
         
-        // Notify parent component that a new post was created
         if (onPostCreated) {
           onPostCreated(response.data);
         }

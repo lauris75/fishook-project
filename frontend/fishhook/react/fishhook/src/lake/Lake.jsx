@@ -4,7 +4,7 @@ import { api } from "../context/AuthContext";
 import { useAdmin } from "../hooks/useAdmin";
 import InfoCard from "../components/infoCard/InfoCard";
 import SearchIcon from '@mui/icons-material/Search';
-import SearchFilter from "../components/searchFilter/SearchFilter"; // Added missing import
+import SearchFilter from "../components/searchFilter/SearchFilter";
 import LakeEditButton from "../components/lakeEditButton/LakeEditButton";
 import LakeFishManager from "../components/lakeFishManager/LakeFishManager";
 import "./Lake.scss";
@@ -20,22 +20,16 @@ const Lake = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // For infinite scrolling
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const LIMIT = 15;
   
-  // Ref for last lake element (for infinite scrolling)
   const lastLakeRef = useRef(null);
   
-  // Flag to ensure we're not making multiple API calls when not needed
   const isLoading = useRef(false);
   
-  // Log component renders for debugging
   console.log("Lake component rendering, id:", id, "lakes count:", lakes.length);
-  
-  // PART 1: SINGLE LAKE VIEW HANDLING
-  // Function to fetch a single lake
+
   const fetchSingleLake = async (lakeId) => {
     console.log("Fetching single lake with ID:", lakeId);
     setLoading(true);
@@ -46,7 +40,6 @@ const Lake = () => {
       
       setLakeData(response.data);
       
-      // Handle fish data
       if (response.data.fishes && Array.isArray(response.data.fishes)) {
         const sortedFish = [...response.data.fishes].sort((a, b) => 
           a.name.localeCompare(b.name)
@@ -78,18 +71,13 @@ const Lake = () => {
       setLoading(false);
     }
   };
-  
-  // PART 2: LAKE LIST HANDLING
-  
-  // Function to fetch lakes (initial or more)
+    
   const fetchLakes = async (isInitialFetch = false) => {
-    // Prevent concurrent fetches
     if (isLoading.current) {
       console.log("Already loading, skipping fetch");
       return;
     }
     
-    // Don't fetch more if we're at the end
     if (!isInitialFetch && !hasMore) {
       console.log("No more lakes to load");
       return;
@@ -98,21 +86,18 @@ const Lake = () => {
     try {
       isLoading.current = true;
       
-      // Set appropriate loading state
       if (isInitialFetch) {
         setLoading(true);
-        setLakes([]); // Clear existing lakes for initial fetch
+        setLakes([]);
         setOffset(0);
       } else {
         setLoadingMore(true);
       }
       
-      // Use the current offset for pagination
       const currentOffset = isInitialFetch ? 0 : offset;
       
       console.log(`Fetching lakes with params: offset=${currentOffset}, limit=${LIMIT}${searchQuery ? `, query=${searchQuery}` : ''}`);
       
-      // Determine endpoint and params based on search query
       let endpoint = "/lake";
       let params = { offset: currentOffset, limit: LIMIT };
       
@@ -121,11 +106,9 @@ const Lake = () => {
         params.query = searchQuery;
       }
       
-      // Make the API call with axios
       const response = await api.get(endpoint, { params });
       console.log(`API response for ${isInitialFetch ? 'initial' : 'more'} lakes:`, response);
       
-      // Process the response data
       let newLakes = [];
       if (Array.isArray(response.data)) {
         newLakes = response.data;
@@ -137,17 +120,14 @@ const Lake = () => {
       
       console.log(`Received ${newLakes.length} lakes`);
       
-      // Update hasMore flag
       setHasMore(newLakes.length === LIMIT);
       
-      // Update lakes list
       if (isInitialFetch) {
         setLakes(newLakes);
       } else {
         setLakes(prevLakes => [...prevLakes, ...newLakes]);
       }
       
-      // Update offset for next page (if this wasn't initial fetch)
       if (!isInitialFetch) {
         setOffset(currentOffset + LIMIT);
       }
@@ -155,35 +135,28 @@ const Lake = () => {
       console.error("Error fetching lakes:", error);
       setError("Failed to load lakes");
     } finally {
-      // Reset loading states
       setLoading(false);
       setLoadingMore(false);
       isLoading.current = false;
     }
   };
-  
-  // PART 3: COMPONENT LIFECYCLE
-  
-  // Initial setup - runs once when component mounts
+    
   useEffect(() => {
     console.log("Initial setup effect running");
     
     if (id) {
-      // Single lake view
       fetchSingleLake(id);
     } else {
-      // Lakes list view - initial fetch
       fetchLakes(true);
     }
     
-    // Set up intersection observer for infinite scrolling
     const setupObserver = () => {
-      if (id) return; // No need for observer in single lake view
+      if (id) return;
       
       const options = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.1 // 10% of the element is visible
+        threshold: 0.1
       };
       
       const observer = new IntersectionObserver((entries) => {
@@ -193,12 +166,10 @@ const Lake = () => {
         }
       }, options);
       
-      // Start observing the last element if it exists
       if (lastLakeRef.current) {
         observer.observe(lastLakeRef.current);
       }
       
-      // Cleanup function
       return () => {
         if (lastLakeRef.current) {
           observer.unobserve(lastLakeRef.current);
@@ -207,42 +178,34 @@ const Lake = () => {
       };
     };
     
-    // Call setupObserver immediately and whenever lakes list changes
     const cleanup = setupObserver();
     
     return () => {
       if (cleanup) cleanup();
     };
-  }, [id]); // Only depend on id to avoid re-running on other state changes
+  }, [id]);
   
-  // Handle search query changes
   useEffect(() => {
     console.log("Search query changed to:", searchQuery);
     
-    // Use a timer to debounce search
     const timer = setTimeout(() => {
-      if (!id) { // Only if we're in list view
-        // Only fetch if we have at least 3 characters or empty query
+      if (!id) {
         if (searchQuery.length === 0 || searchQuery.length >= 3) {
-          fetchLakes(true); // Reset and fetch with new search
+          fetchLakes(true);
         }
       }
-    }, 800); // Increased debounce time to 800ms
+    }, 800);
     
     return () => clearTimeout(timer);
   }, [searchQuery]);
   
-  // Update observer when lakes list changes
   useEffect(() => {
     console.log("Lakes list updated, lakes count:", lakes.length);
     
-    // If we're in single lake view, do nothing
     if (id) return;
     
-    // If there are no lakes or we're still loading, do nothing
     if (lakes.length === 0 || loading) return;
     
-    // Setup observer for the last lake element
     const options = {
       root: null,
       rootMargin: '0px',
@@ -256,13 +219,11 @@ const Lake = () => {
       }
     }, options);
     
-    // Start observing the last element if it exists
     if (lastLakeRef.current) {
       console.log("Starting to observe last lake element");
       observer.observe(lastLakeRef.current);
     }
     
-    // Cleanup function
     return () => {
       if (lastLakeRef.current) {
         observer.unobserve(lastLakeRef.current);
@@ -271,9 +232,6 @@ const Lake = () => {
     };
   }, [lakes, id, loading, hasMore]);
   
-  // PART 4: EVENT HANDLERS
-  
-  // Handle lake update from admin
   const handleLakeUpdated = (updatedLake) => {
     setLakeData(prev => ({
       ...prev,
@@ -287,7 +245,6 @@ const Lake = () => {
     }));
   };
   
-  // Handle fish associations changes
   const handleAssociationsChanged = (action, changedFish) => {
     if (action === 'add') {
       setRelatedFish(prev => {
@@ -321,10 +278,7 @@ const Lake = () => {
       return prev;
     });
   };
-  
-  // PART 5: COMPONENT RENDERING
-  
-  // Loading state for initial load
+    
   if (loading) {
     return (
       <div className="lake-page">
@@ -336,7 +290,6 @@ const Lake = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="lake-page">
@@ -349,7 +302,6 @@ const Lake = () => {
     );
   }
 
-  // Detail view (single lake)
   if (id && lakeData) {
     return (
       <div className="lake-page single-view">
@@ -367,7 +319,6 @@ const Lake = () => {
           coastlineLength={lakeData.coastlineLength}
         />
         
-        {/* Admin Buttons */}
         {isAdmin && (
           <div className="admin-actions">
             <LakeEditButton lake={lakeData} onLakeUpdated={handleLakeUpdated} />
@@ -378,7 +329,6 @@ const Lake = () => {
           </div>
         )}
         
-        {/* Related Fish Section */}
         <div className="related-section">
           <h2>Fish species found in this lake:</h2>
           
@@ -408,7 +358,6 @@ const Lake = () => {
     );
   }
 
-  // List view (all lakes with infinite scrolling)
   return (
     <div className="lake-page list-view">
       <h1>Fishing Lakes</h1>
@@ -431,7 +380,6 @@ const Lake = () => {
         <div className="lake-grid">
           {lakes.map((lake, index) => (
             <div 
-              // Assign ref to last element for infinite scrolling
               ref={index === lakes.length - 1 ? lastLakeRef : null}
               className="lake-card" 
               key={lake.id} 

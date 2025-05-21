@@ -26,7 +26,7 @@ const GroupForm = ({ onGroupCreated }) => {
     e.preventDefault();
     
     if (!groupName.trim()) {
-      return; // Don't submit without a group name
+      return;
     }
     
     setIsSubmitting(true);
@@ -34,24 +34,19 @@ const GroupForm = ({ onGroupCreated }) => {
     try {
       let finalImageUrl = "https://images.unsplash.com/photo-1592929043000-fbea34bc8ad5?auto=format&fit=crop&w=1170&q=80"; // Default image
       
-      // Upload image to Firebase if there is one
       if (image) {
         const storageRef = ref(storage, `groups/${currentUser.id}/${uuidv4()}`);
         
-        // Create the file metadata
         const metadata = {
           contentType: image.type,
         };
         
-        // Upload file and metadata
         const uploadTask = uploadBytesResumable(storageRef, image, metadata);
         
-        // Listen for state changes, errors, and completion
         await new Promise((resolve, reject) => {
           uploadTask.on(
             'state_changed', 
             (snapshot) => {
-              // Update progress
               const progress = Math.round(
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100
               );
@@ -62,7 +57,6 @@ const GroupForm = ({ onGroupCreated }) => {
               reject(error);
             },
             async () => {
-              // Upload completed, get download URL
               try {
                 finalImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
                 resolve();
@@ -75,7 +69,6 @@ const GroupForm = ({ onGroupCreated }) => {
         });
       }
       
-      // Create group data
       const groupData = {
         ownerId: currentUser.id,
         groupName: groupName,
@@ -86,7 +79,6 @@ const GroupForm = ({ onGroupCreated }) => {
       const response = await api.post('/group', groupData);
       
       if (response.status === 201) {
-        // Clear form after successful submission
         setGroupName("");
         setSummary("");
         setImage(null);
@@ -94,7 +86,6 @@ const GroupForm = ({ onGroupCreated }) => {
         setUploadProgress(0);
         setIsFormVisible(false);
         
-        // Notify parent component that a new group was created
         if (onGroupCreated) {
           onGroupCreated(response.data);
         }

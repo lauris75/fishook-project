@@ -25,7 +25,6 @@ const Comments = ({ comments = [], postId, onCommentAdded }) => {
         date: new Date()
       });
       
-      // Create a new comment object
       const newComment = {
         id: response.data.id,
         userId: currentUser.id,
@@ -38,7 +37,6 @@ const Comments = ({ comments = [], postId, onCommentAdded }) => {
         }
       };
       
-      // Call the callback from parent with the new comment
       if (onCommentAdded) {
         onCommentAdded(newComment);
       }

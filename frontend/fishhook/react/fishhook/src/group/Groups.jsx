@@ -12,7 +12,6 @@ const Groups = () => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   
   const handleGroupCreated = (newGroup) => {
-    // Add the new group to the list
     setAllGroups(prevGroups => [newGroup, ...prevGroups]);
     setFilteredGroups(prevGroups => [newGroup, ...prevGroups]);
   };
@@ -33,7 +32,6 @@ const Groups = () => {
     fetchGroups();
   }, []);
 
-  // Filter groups based on search query
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredGroups(allGroups);
@@ -55,7 +53,6 @@ const Groups = () => {
       <h1>Fishing Groups</h1>
       <p className="page-description">Join fishing communities, share experiences, and connect with other anglers.</p>
       
-      {/* Group creation form */}
       <GroupForm onGroupCreated={handleGroupCreated} />
       
       <SearchFilter 

@@ -12,7 +12,6 @@ const AdminEditForm = ({
   error
 }) => {
   const [formData, setFormData] = useState(() => {
-    // Initialize form data from item and fields configuration
     const initialData = {};
     fields.forEach(field => {
       initialData[field.name] = item[field.name] || '';

@@ -23,7 +23,6 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
   const profilePicInputRef = useRef(null);
   const coverPicInputRef = useRef(null);
 
-  // Handle profile picture change
   const handleProfilePicChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfilePic(e.target.files[0]);
@@ -31,7 +30,6 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
     }
   };
 
-  // Handle cover picture change
   const handleCoverPicChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setCoverPic(e.target.files[0]);
@@ -39,12 +37,10 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
     }
   };
 
-  // Handle description change
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
-  // Upload a file to Firebase and get the download URL
   const uploadFileToFirebase = async (file, fileType) => {
     if (!file) return null;
 
@@ -80,7 +76,6 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -90,28 +85,23 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
       let profilePicURL = profilePicUrl;
       let coverPicURL = coverPicUrl;
 
-      // Upload profile picture if changed
       if (profilePic) {
         profilePicURL = await uploadFileToFirebase(profilePic, 'profile');
       }
 
-      // Upload cover picture if changed
       if (coverPic) {
         coverPicURL = await uploadFileToFirebase(coverPic, 'cover');
       }
 
-      // Prepare the update request
       const updateData = {
         profilePicture: profilePicURL,
         coverPicture: coverPicURL,
         description: description
       };
 
-      // Send the update request to the API
       const response = await api.put('/user/profile', updateData);
 
       if (response.status === 200) {
-        // Call the onUpdate callback with the updated data
         if (onUpdate) {
           onUpdate({
             ...profile,
@@ -119,7 +109,6 @@ const ProfileUpdateForm = ({ profile, onClose, onUpdate }) => {
           });
         }
         
-        // Close the form
         if (onClose) {
           onClose();
         }

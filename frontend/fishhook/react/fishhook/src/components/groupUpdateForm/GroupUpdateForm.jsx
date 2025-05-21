@@ -17,7 +17,6 @@ const GroupUpdateForm = ({ group, onClose, onUpdate }) => {
   
   const photoInputRef = useRef(null);
 
-  // Handle group photo change
   const handlePhotoChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setGroupPhoto(e.target.files[0]);
@@ -25,12 +24,10 @@ const GroupUpdateForm = ({ group, onClose, onUpdate }) => {
     }
   };
 
-  // Handle summary change
   const handleSummaryChange = (e) => {
     setSummary(e.target.value);
   };
 
-  // Upload a file to Firebase and get the download URL
   const uploadFileToFirebase = async (file) => {
     if (!file) return null;
 
@@ -63,7 +60,6 @@ const GroupUpdateForm = ({ group, onClose, onUpdate }) => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -72,22 +68,18 @@ const GroupUpdateForm = ({ group, onClose, onUpdate }) => {
     try {
       let photoURL = groupPhotoUrl;
 
-      // Upload photo if changed
       if (groupPhoto) {
         photoURL = await uploadFileToFirebase(groupPhoto);
       }
 
-      // Prepare the update request
       const updateData = {
         photoURL: photoURL,
         summary: summary
       };
 
-      // Send the update request to the API
       const response = await api.put(`/group/${group.id}`, updateData);
 
       if (response.status === 200) {
-        // Call the onUpdate callback with the updated data
         if (onUpdate) {
           onUpdate({
             ...group,
@@ -95,7 +87,6 @@ const GroupUpdateForm = ({ group, onClose, onUpdate }) => {
           });
         }
         
-        // Close the form
         if (onClose) {
           onClose();
         }

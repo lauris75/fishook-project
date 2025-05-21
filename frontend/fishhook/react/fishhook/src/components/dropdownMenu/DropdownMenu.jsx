@@ -4,7 +4,6 @@ import './DropdownMenu.scss';
 const DropdownMenu = ({ options, anchorEl, isOpen, setIsOpen }) => {
   const menuRef = useRef(null);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target) && 

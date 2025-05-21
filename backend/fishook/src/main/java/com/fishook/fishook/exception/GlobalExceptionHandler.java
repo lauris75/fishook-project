@@ -17,6 +17,4 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.CONFLICT);
     }
-
-    // Add other exception handlers as needed
 }

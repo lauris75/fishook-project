@@ -18,30 +18,22 @@ const UsefulInfo = () => {
   const [filteredInfo, setFilteredInfo] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("all");
   
-  // This could be expanded to real categories from the backend
-  // For now, we'll just extract categories from the data
   const [categories, setCategories] = useState([]);
 
-  // Fetch data based on whether we're viewing a list or a single item
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
-          // Fetch single useful information
           const response = await api.get(`/UsefulInformation/${id}`);
           setInfoData(response.data);
         } else {
-          // Fetch all useful information for the list view
           const response = await api.get("/UsefulInformation");
           setAllInfo(response.data);
           setFilteredInfo(response.data);
           
-          // Extract "categories" from data based on first word of name or something similar
-          // This is just a placeholder - ideally categories would come from the backend
           const extractedCategories = Array.from(
             new Set(
               response.data.map(info => {
-                // Use first word of name as a simple category
                 const firstWord = info.name.split(' ')[0].toLowerCase();
                 return firstWord;
               })
@@ -65,12 +57,10 @@ const UsefulInfo = () => {
     fetchData();
   }, [id]);
 
-  // Filter information based on search query and category (for list view)
   useEffect(() => {
     if (!id) {
       let filtered = allInfo;
       
-      // Apply search filter
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(
@@ -80,7 +70,6 @@ const UsefulInfo = () => {
         );
       }
       
-      // Apply category filter
       if (categoryFilter !== "all") {
         filtered = filtered.filter(
           info => info.name.toLowerCase().startsWith(categoryFilter.toLowerCase())
@@ -96,7 +85,6 @@ const UsefulInfo = () => {
   };
 
   const handleInfoUpdated = (updatedInfo) => {
-    // Update the info data
     setInfoData(prev => ({
       ...prev,
       name: updatedInfo.name,
@@ -108,7 +96,6 @@ const UsefulInfo = () => {
   if (loading) return <div className="useful-info-page">Loading information...</div>;
   if (error) return <div className="useful-info-page">Error: {error}</div>;
 
-  // Detail view (single useful information)
   if (id && infoData) {
     return (
       <div className="useful-info-page single-view">
@@ -120,7 +107,6 @@ const UsefulInfo = () => {
           description={infoData.description}
         />
         
-        {/* Admin Edit Button */}
         {isAdmin && (
           <div className="admin-actions">
             <UsefulInfoEditButton info={infoData} onInfoUpdated={handleInfoUpdated} />
@@ -130,7 +116,6 @@ const UsefulInfo = () => {
     );
   }
 
-  // List view (all useful information)
   return (
     <div className="useful-info-page list-view">
       <h1>Fishing Tips & Knowledge</h1>

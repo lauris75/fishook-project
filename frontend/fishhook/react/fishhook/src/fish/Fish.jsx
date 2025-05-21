@@ -19,35 +19,28 @@ const Fish = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFish, setFilteredFish] = useState([]);
 
-  // If we have an ID parameter, fetch single fish data
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
-          // Get fish with related lakes
           const response = await api.get(`/fish/${id}/withLakes`);
           setFishData(response.data);
           
-          // If fish has lakes property and it's an array
           if (response.data.lakes && Array.isArray(response.data.lakes)) {
-            // Sort lakes alphabetically by name
             const sortedLakes = [...response.data.lakes].sort((a, b) => 
               a.name.localeCompare(b.name)
             );
             setRelatedLakes(sortedLakes);
           } else {
-            // Alternatively fetch lake-fish associations
             try {
               const lakeFishResponse = await api.get(`/lakeFish/fish/${id}`);
               if (lakeFishResponse.data && lakeFishResponse.data.length > 0) {
-                // Get lake details for each association
                 const lakePromises = lakeFishResponse.data.map(lakeFish => 
                   api.get(`/lake/${lakeFish.lakeId}`)
                 );
                 const lakeResponses = await Promise.all(lakePromises);
                 const lakes = lakeResponses.map(res => res.data);
                 
-                // Sort lakes alphabetically by name
                 const sortedLakes = [...lakes].sort((a, b) => 
                   a.name.localeCompare(b.name)
                 );
@@ -58,7 +51,6 @@ const Fish = () => {
             }
           }
         } else {
-          // Fetch all fish for the list view
           const response = await api.get("/fish");
           setAllFish(response.data);
           setFilteredFish(response.data);
@@ -73,7 +65,6 @@ const Fish = () => {
     fetchData();
   }, [id]);
 
-  // Filter fish based on search query (only for list view)
   useEffect(() => {
     if (!id && searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
@@ -89,7 +80,6 @@ const Fish = () => {
   }, [searchQuery, allFish, id]);
 
   const handleFishUpdated = (updatedFish) => {
-    // Update the fish data while preserving lakes data
     setFishData(prev => ({
       ...prev,
       name: updatedFish.name,
@@ -98,23 +88,18 @@ const Fish = () => {
     }));
   };
   
-  // Handle lake associations changes
   const handleAssociationsChanged = (action, changedLake) => {
     if (action === 'add') {
-      // Add the new lake to the related lakes list
       setRelatedLakes(prev => {
         const updated = [...prev, changedLake];
-        // Sort alphabetically
         return updated.sort((a, b) => a.name.localeCompare(b.name));
       });
     } else if (action === 'remove') {
-      // Remove the lake from the related lakes list
       setRelatedLakes(prev => 
         prev.filter(lake => lake.id !== changedLake.id)
       );
     }
     
-    // Also update the fish data to reflect the change
     setFishData(prev => {
       if (!prev.lakes) {
         prev.lakes = [];
@@ -140,7 +125,6 @@ const Fish = () => {
   if (loading) return <div className="fish-page">Loading fish information...</div>;
   if (error) return <div className="fish-page">Error: {error}</div>;
 
-  // Detail view (single fish)
   if (id && fishData) {
     return (
       <div className="fish-page single-view">
@@ -152,7 +136,6 @@ const Fish = () => {
           description={fishData.description}
         />
         
-        {/* Admin Buttons */}
         {isAdmin && (
           <div className="admin-actions">
             <FishEditButton fish={fishData} onFishUpdated={handleFishUpdated} />
@@ -163,7 +146,6 @@ const Fish = () => {
           </div>
         )}
         
-        {/* Related Lakes Section */}
         <div className="related-section">
           <h2>This fish can be found in these lakes:</h2>
           
@@ -192,7 +174,6 @@ const Fish = () => {
     );
   }
 
-  // List view (all fish)
   return (
     <div className="fish-page list-view">
       <h1>Fish Species</h1>

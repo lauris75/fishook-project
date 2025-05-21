@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PetsIcon from '@mui/icons-material/Pets'; // Changed from LocalFloatingIcon
+import PetsIcon from '@mui/icons-material/Pets';
 import AdminAssociationManager from '../adminAssociation/AdminAssociationManager';
 import '../adminEditButton/AdminEditButton.scss';
 

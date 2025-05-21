@@ -35,7 +35,7 @@ public class LakeController {
     public ResponseEntity<?> createLake(@RequestBody Lake lake) {
         return new ResponseEntity<>(lakeService.createLake(lake), HttpStatus.CREATED);
     }
-    
+
     @GetMapping
     public ResponseEntity<List<Lake>> getAllLakes(
             @RequestParam(defaultValue = "0") int offset,
@@ -44,7 +44,6 @@ public class LakeController {
         try {
             List<Lake> lakes = lakeService.getAllLakesBatch(offset, limit);
 
-            // Map to DTOs without related entities
             List<Lake> lakeDtos = lakes.stream()
                     .map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(),
                             p.getPhotoURL(), p.getLatitude(), p.getLongitude(), p.getArea(),
@@ -66,7 +65,6 @@ public class LakeController {
         try {
             List<Lake> lakes = lakeService.searchLakesBatch(query, offset, limit);
 
-            // Map to DTOs without related entities
             List<Lake> lakeDtos = lakes.stream()
                     .map(p -> new Lake(p.getId(), p.getName(), p.getSummary(), p.getDescription(),
                             p.getPhotoURL(), p.getLatitude(), p.getLongitude(), p.getArea(),

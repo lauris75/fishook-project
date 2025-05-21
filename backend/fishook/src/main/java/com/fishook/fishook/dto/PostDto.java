@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL) // Only include non-null fields in JSON
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDto {
     private Long id;
     private Long userId;

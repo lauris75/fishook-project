@@ -36,7 +36,6 @@ const Login = () => {
       const response = await axios.post("http://localhost:8081/auth/login", inputs);
             
       if (response.data && response.data.token) {
-        // Pass both the user data AND the token to the login function
         login(response.data.user, response.data.token);
         navigate("/");
       }

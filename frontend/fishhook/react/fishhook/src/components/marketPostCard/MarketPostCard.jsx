@@ -21,17 +21,14 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
-  // Show options menu for owner or admin
   const canManageListing = post.userId === currentUser.id || isAdmin;
 
   useEffect(() => {
     const fetchAdditionalData = async () => {
       try {
-        // Fetch seller (user) information
         const userResponse = await api.get(`/user/${post.userId}`);
         setSeller(userResponse.data);
         
-        // Fetch category information
         const categoryResponse = await api.get(`/category/${post.categoryId}`);
         setCategory(categoryResponse.data);
         
@@ -45,12 +42,10 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
     fetchAdditionalData();
   }, [post.userId, post.categoryId]);
   
-  // Format the date to show how long ago the post was created
   const formattedDate = post.date 
     ? formatDistanceToNow(new Date(post.date), { addSuffix: true }) 
     : "unknown time";
   
-  // Format price to 2 decimal places
   const formattedPrice = post.price ? 
     parseFloat(post.price).toFixed(2) : 
     '0.00';
@@ -97,7 +92,6 @@ const MarketPostCard = ({ post, onPostDeleted }) => {
     }
   ];
   
-  // Different message for admin vs owner
   const deleteMessage = isAdmin && post.userId !== currentUser.id
     ? "As an admin, you are about to delete another user's marketplace listing. This action cannot be undone."
     : "Are you sure you want to delete this marketplace listing? This action cannot be undone.";

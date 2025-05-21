@@ -20,10 +20,8 @@ const AdminAssociationManager = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Get the current association IDs
   const currentAssociationIds = currentAssociations.map(item => item.id);
 
-  // Fetch available items for association
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
       setSearchResults([]);
@@ -34,11 +32,9 @@ const AdminAssociationManager = ({
       setLoading(true);
       setError(null);
       try {
-        // The endpoint depends on what we're searching for
         const endpoint = `/${targetType.toLowerCase()}`;
         const response = await api.get(endpoint);
         
-        // Filter results by search query and exclude already associated items
         const filtered = response.data.filter(item => 
           (item.name.toLowerCase().includes(searchQuery.toLowerCase())) && 
           !currentAssociationIds.includes(item.id)
@@ -56,21 +52,16 @@ const AdminAssociationManager = ({
     fetchItems();
   }, [searchQuery, targetType, currentAssociationIds]);
 
-  // Add an association
   const handleAddAssociation = async (itemId) => {
     try {
-      // Path format: /{sourceType}/{sourceId}/{targetType}/{targetId}
-      // Example: /lake/5/fish/10 or /fish/10/lake/5
       const response = await api.post(`/${sourceType.toLowerCase()}/${sourceId}/${targetType.toLowerCase()}/${itemId}`);
       
-      // Find the full item data from search results
       const addedItem = searchResults.find(item => item.id === itemId);
       
       if (addedItem && onAssociationChange) {
         onAssociationChange('add', addedItem);
       }
       
-      // Clear the search results and query
       setSearchQuery('');
       setSearchResults([]);
     } catch (err) {
@@ -79,11 +70,8 @@ const AdminAssociationManager = ({
     }
   };
 
-  // Remove an association
   const handleRemoveAssociation = async (itemId) => {
     try {
-      // Path format: /{sourceType}/{sourceId}/{targetType}/{targetId}
-      // Example: /lake/5/fish/10 or /fish/10/lake/5
       const response = await api.delete(`/${sourceType.toLowerCase()}/${sourceId}/${targetType.toLowerCase()}/${itemId}`);
       
       if (onAssociationChange) {

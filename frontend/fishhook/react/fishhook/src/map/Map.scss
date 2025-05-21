@@ -2,14 +2,14 @@
   padding: 20px;
   
   &.full-width {
-    padding: 20px 0; /* Remove horizontal padding */
-    max-width: 100%; /* Take full width */
+    padding: 20px 0;
+    max-width: 100%;
     
     .map-container {
       margin: 0;
       max-width: none;
-      border-radius: 0; /* Remove rounded corners for full-width view */
-      box-shadow: none; /* Remove shadow for full-width view */
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .map-header {
@@ -100,7 +100,7 @@
         position: absolute;
         top: 20px;
         right: 20px;
-        width: 350px; /* Increased width to accommodate weather info */
+        width: 350px;
         max-width: calc(100% - 40px);
         background-color: white;
         border-radius: 10px;
@@ -110,7 +110,6 @@
         max-height: calc(100vh - 260px);
         overflow-y: auto;
         
-        /* Scrollbar styling */
         &::-webkit-scrollbar {
           width: 6px;
         }
@@ -237,7 +236,6 @@
   }
 }
 
-/* Style for popup content */
 .lake-popup {
   h3 {
     margin: 0 0 8px 0;

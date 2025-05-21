@@ -18,7 +18,6 @@ const TopBar = () => {
   const searchContainerRef = useRef(null);
   const searchDebounceRef = useRef(null);
   
-  // Handle outside click to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
@@ -32,14 +31,11 @@ const TopBar = () => {
     };
   }, []);
   
-  // Handle search when query changes
   useEffect(() => {
-    // Clear previous timeout
     if (searchDebounceRef.current) {
       clearTimeout(searchDebounceRef.current);
     }
     
-    // Don't search if query is too short
     if (!searchQuery || searchQuery.trim().length < 3) {
       setSearchResults([]);
       setLoading(false);
@@ -48,7 +44,6 @@ const TopBar = () => {
     
     setLoading(true);
     
-    // Debounce search to avoid too many requests
     searchDebounceRef.current = setTimeout(async () => {
       try {
         const response = await api.get(`/search/users?query=${encodeURIComponent(searchQuery.trim())}&limit=7`);
@@ -60,7 +55,7 @@ const TopBar = () => {
       } finally {
         setLoading(false);
       }
-    }, 300); // 300ms debounce
+    }, 300);
     
     return () => {
       if (searchDebounceRef.current) {
@@ -73,7 +68,6 @@ const TopBar = () => {
     const query = e.target.value;
     setSearchQuery(query);
     
-    // Show dropdown only if query is at least 3 chars
     if (query.trim().length >= 3) {
       setDropdownVisible(true);
     } else {
@@ -98,8 +92,8 @@ const TopBar = () => {
   };
   
   const handleLogout = () => {
-    logout(); // Call the logout function from the context
-    navigate("/login"); // Navigate to the login page
+    logout();
+    navigate("/login");
   };
   
   return (

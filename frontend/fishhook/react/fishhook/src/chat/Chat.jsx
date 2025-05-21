@@ -22,14 +22,11 @@ const Chat = () => {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Fetch contacts (people the user follows)
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        // Get people the user follows
         const followingResponse = await api.get("/following");
         
-        // Get user details for each person they follow
         const contactsPromises = followingResponse.data.map(async (follow) => {
           try {
             const userResponse = await api.get(`/user/${follow.followee}`);
@@ -42,17 +39,14 @@ const Chat = () => {
         
         const contactsData = (await Promise.all(contactsPromises)).filter(contact => contact !== null);
         
-        // Get conversation partners from chat API
         const chatResponse = await api.get("/chat/my-chats");
         
-        // Extract unique users from chat data
         const chatPartners = new Set();
         chatResponse.data.forEach(chat => {
           const partnerId = chat.senderId === currentUser.id ? chat.receiverId : chat.senderId;
           chatPartners.add(partnerId);
         });
         
-        // Fetch users that are chat partners but not in contacts
         const additionalContactsPromises = Array.from(chatPartners)
           .filter(partnerId => !contactsData.some(contact => contact.id === partnerId))
           .map(async partnerId => {
@@ -67,7 +61,6 @@ const Chat = () => {
         
         const additionalContacts = (await Promise.all(additionalContactsPromises)).filter(contact => contact !== null);
         
-        // Combine contacts and chat partners, remove duplicates
         const allContacts = [...contactsData, ...additionalContacts]
           .filter((contact, index, self) => 
             index === self.findIndex(c => c.id === contact.id)
@@ -76,15 +69,12 @@ const Chat = () => {
         
         setContacts(allContacts);
         
-        // Organize conversations by partner
         const conversationsMap = {};
         
-        // Process each contact to get their conversation
         for (const contact of allContacts) {
           try {
             const conversationResponse = await api.get(`/chat/conversation/${contact.id}`);
             if (conversationResponse.data && conversationResponse.data.length > 0) {
-              // Remove duplicates (by ID) before adding to the conversations map
               const uniqueMessages = conversationResponse.data.filter((message, index, self) =>
                 index === self.findIndex((m) => m.id === message.id)
               );
@@ -107,24 +97,19 @@ const Chat = () => {
     fetchContacts();
   }, [currentUser.id, api]);
 
-  // Handle seller parameter from marketplace
   useEffect(() => {
     if (!isLoading && contacts.length > 0) {
       const urlParams = new URLSearchParams(window.location.search);
       const sellerId = urlParams.get('seller');
       
       if (sellerId) {
-        // Convert sellerId to number
         const sellerIdNum = parseInt(sellerId);
         
-        // Check if we already have this contact
         const sellerContact = contacts.find(contact => contact.id === sellerIdNum);
         
         if (sellerContact) {
-          // If we have this contact, set them as active chat
           setActiveChat(sellerIdNum);
           
-          // Pre-populate message if this is a new conversation
           const hasExistingConversation = conversations[sellerIdNum] && 
                                           conversations[sellerIdNum].length > 0;
           
@@ -132,20 +117,16 @@ const Chat = () => {
             setMessage("Hi, I'm interested in your listing on the marketplace.");
           }
         } else {
-          // If we don't have this contact, fetch their info
           const fetchSellerInfo = async () => {
             try {
               const sellerResponse = await api.get(`/user/${sellerIdNum}`);
               
               if (sellerResponse.data) {
-                // Add seller to contacts
                 const newContact = sellerResponse.data;
                 setContacts(prevContacts => [...prevContacts, newContact]);
                 
-                // Set as active chat
                 setActiveChat(sellerIdNum);
                 
-                // Pre-populate message
                 setMessage("Hi, I'm interested in your listing on the marketplace.");
               }
             } catch (error) {
@@ -156,13 +137,11 @@ const Chat = () => {
           fetchSellerInfo();
         }
         
-        // Clean up URL parameters
         window.history.replaceState({}, document.title, "/chat");
       }
     }
   }, [isLoading, contacts, conversations, api]);
 
-  // Scroll to bottom of messages when activeChat changes or new messages arrive
   useEffect(() => {
     scrollToBottom();
   }, [activeChat, conversations]);
@@ -192,7 +171,6 @@ const Chat = () => {
     try {
       let photoURL = null;
       
-      // Upload image if there is one
       if (image) {
         const storageRef = ref(storage, `chats/${currentUser.id}/${uuidv4()}`);
         const uploadTask = uploadBytesResumable(storageRef, image);
@@ -222,7 +200,6 @@ const Chat = () => {
         });
       }
       
-      // Determine message type and content
       let messageType = "text";
       let messageContent = message.trim();
       
@@ -236,7 +213,6 @@ const Chat = () => {
         }
       }
       
-      // Create chat message
       const chatData = {
         senderId: currentUser.id,
         receiverId: activeChat,
@@ -245,7 +221,6 @@ const Chat = () => {
         date: new Date()
       };
       
-      // Clear form immediately to prevent duplicate sends
       const currentMessageText = message;
       const currentImageData = image;
       setMessage("");
@@ -253,30 +228,24 @@ const Chat = () => {
       setImageUrl("");
       setUploadProgress(0);
       
-      // Send the message to the server
       const response = await api.post('/chat', chatData);
       
-      // Only update the conversation state if we get a valid response
       if (response.data && response.data.id) {
         setConversations(prev => {
-          // Create a copy of the previous conversations state
           const updatedConversations = {...prev};
           
-          // Initialize the array for this contact if it doesn't exist
           if (!updatedConversations[activeChat]) {
             updatedConversations[activeChat] = [];
           }
           
-          // Check if the message is already in the conversation (by id or similar content)
           const isDuplicate = updatedConversations[activeChat].some(msg => 
             msg.id === response.data.id || 
             (msg.senderId === response.data.senderId && 
              msg.receiverId === response.data.receiverId &&
              msg.message === response.data.message &&
-             Math.abs(new Date(msg.date) - new Date(response.data.date)) < 1000) // Within 1 second
+             Math.abs(new Date(msg.date) - new Date(response.data.date)) < 1000)
           );
           
-          // Only add the message if it's not a duplicate
           if (!isDuplicate) {
             updatedConversations[activeChat].push(response.data);
           }
@@ -286,7 +255,6 @@ const Chat = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      // If there's an error, you may want to re-enable the form with the previous values
     }
   };
 
@@ -396,7 +364,6 @@ const Chat = () => {
             <div className="messages-container">
               {conversations[activeChat] && conversations[activeChat].length > 0 ? (
                 <div className="messages-list">
-                  {/* Filter out any duplicate messages by ID before rendering */}
                   {conversations[activeChat]
                     .filter((msg, index, self) => 
                       index === self.findIndex(m => m.id === msg.id)

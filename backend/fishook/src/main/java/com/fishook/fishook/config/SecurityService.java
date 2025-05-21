@@ -18,12 +18,6 @@ public class SecurityService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Gets the current user ID by extracting the email from the principal
-     * in the security context and then finding the user by email
-     *
-     * @return The current user ID or null if not authenticated
-     */
     public Long getCurrentUserId() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

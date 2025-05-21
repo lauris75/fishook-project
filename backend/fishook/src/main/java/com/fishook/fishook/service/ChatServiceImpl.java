@@ -29,7 +29,6 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Chat createChat(Chat chat) {
-        // Set the current date if not provided
         if (chat.getDate() == null) {
             chat.setDate(new Date());
         }
@@ -44,22 +43,17 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<ChatDto> getAllChatsByUser(Long userId) {
-        // Get all chats where the user is either the sender or receiver
         List<Chat> userChats = chatRepository.findAllBySenderIdOrReceiverId(userId, userId);
 
-        // Map Chat entities to ChatDto objects with user information
         return mapChatsToDtos(userChats);
     }
 
     @Override
     public List<ChatDto> getConversation(Long userId1, Long userId2) {
-        // Get all chats between two users
         List<Chat> conversation = chatRepository.findAllBetweenUsers(userId1, userId2);
 
-        // Sort by date (oldest first)
         conversation.sort(Comparator.comparing(Chat::getDate));
 
-        // Map Chat entities to ChatDto objects with user information
         return mapChatsToDtos(conversation);
     }
 
@@ -75,14 +69,12 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public String deleteChatById(Long chatId) {
-        // Verify the user is authorized to delete this chat
         Optional<Chat> chatOpt = chatRepository.findById(chatId);
 
         if (chatOpt.isPresent()) {
             Chat chat = chatOpt.get();
             Long currentUserId = securityService.getCurrentUserId();
 
-            // Only allow deletion if current user is the sender
             if (currentUserId != null && currentUserId.equals(chat.getSenderId())) {
                 chatRepository.deleteById(chatId);
                 return "Deleted";
@@ -94,9 +86,6 @@ public class ChatServiceImpl implements ChatService {
         return "Chat not found";
     }
 
-    /**
-     * Helper method to map Chat entities to ChatDto objects with user information
-     */
     private List<ChatDto> mapChatsToDtos(List<Chat> chats) {
         if (chats == null || chats.isEmpty()) {
             return new ArrayList<>();
@@ -111,7 +100,6 @@ public class ChatServiceImpl implements ChatService {
             dto.setType(chat.getType());
             dto.setDate(chat.getDate());
 
-            // Get sender information
             UserEntity sender = userService.getUserById(chat.getSenderId())
                     .orElse(null);
 
@@ -128,7 +116,6 @@ public class ChatServiceImpl implements ChatService {
                 dto.setSender(senderDto);
             }
 
-            // Get receiver information
             UserEntity receiver = userService.getUserById(chat.getReceiverId())
                     .orElse(null);
 

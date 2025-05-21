@@ -26,15 +26,13 @@ const Post = ({ post, onPostDeleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const moreOptionsRef = useRef(null);
   
-  // Show options menu for owner or admin
   const canManagePost = post.userId === currentUser.id || isAdmin;
   
-  // Updated to sort newest-first
   const sortCommentsByDate = (commentsArray) => {
     return [...commentsArray].sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateB - dateA; // Changed from dateA - dateB to sort newest-first
+      return dateB - dateA;
     });
   };
   
@@ -91,7 +89,6 @@ const Post = ({ post, onPostDeleted }) => {
       if (onPostDeleted) {
         onPostDeleted(post.id);
       } else {
-        // If no callback provided, we can show a success message or refresh the page
         window.location.reload();
       }
     } catch (error) {
@@ -106,7 +103,6 @@ const Post = ({ post, onPostDeleted }) => {
     setMenuOpen(!menuOpen);
   };
   
-  // Create the options based on whether it's admin or owner deleting
   const moreOptions = [
     {
       label: isAdmin && post.userId !== currentUser.id ? "Delete Post (Admin)" : "Delete Post",
@@ -116,7 +112,6 @@ const Post = ({ post, onPostDeleted }) => {
     }
   ];
   
-  // Different message for admin vs owner
   const deleteMessage = isAdmin && post.userId !== currentUser.id
     ? "As an admin, you are about to delete another user's post. This action cannot be undone."
     : "Are you sure you want to delete this post? This action cannot be undone.";

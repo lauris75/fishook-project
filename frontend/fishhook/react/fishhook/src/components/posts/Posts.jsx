@@ -11,7 +11,6 @@ const Posts = ({ userId, groupId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Determine if we're viewing the current user's profile
   const isOwnProfile = userId ? parseInt(userId) === currentUser.id : true;
 
   useEffect(() => {
@@ -19,12 +18,10 @@ const Posts = ({ userId, groupId }) => {
       try {
         let endpoint = '/userPost';
         
-        // If userId is provided, fetch posts for that specific user
         if (userId) {
           endpoint = `/userPost/userPosts/${userId}`;
         }
         
-        // If groupId is provided, fetch posts for that specific group
         if (groupId) {
           endpoint = `/userPost/groupPosts/${groupId}`;
         }
@@ -39,15 +36,13 @@ const Posts = ({ userId, groupId }) => {
     };
 
     fetchPosts();
-  }, [userId, groupId, currentUser.id]); // Added currentUser.id as a dependency
+  }, [userId, groupId, currentUser.id]);
 
   const handlePostCreated = (newPost) => {
-    // Add the new post to the top of the posts list
     setPosts(prevPosts => [newPost, ...prevPosts]);
   };
   
   const handlePostDeleted = (postId) => {
-    // Remove the deleted post from the posts list
     setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
   };
 
@@ -56,14 +51,12 @@ const Posts = ({ userId, groupId }) => {
 
   return (
     <div className="posts">
-      {/* Post creation form - only show on own profile or in groups */}
       <PostForm 
         groupId={groupId} 
         onPostCreated={handlePostCreated}
         isOwnProfile={isOwnProfile} 
       />
       
-      {/* List of posts */}
       {posts.length === 0 ? (
         <div className="no-posts">
           <p>No posts to display</p>

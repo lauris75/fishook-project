@@ -74,7 +74,7 @@ const Group = () => {
   const handleDeleteGroup = async () => {
     try {
       await api.delete(`/group/${id}`);
-      navigate('/group'); // Navigate back to groups list
+      navigate('/group');
     } catch (err) {
       console.error("Error deleting group:", err);
       setError(err.message || "Failed to delete group");
@@ -99,11 +99,9 @@ const Group = () => {
     setMenuOpen(!menuOpen);
   };
   
-  // Create the options for dropdown menu
   const createMoreOptions = () => {
     const options = [];
     
-    // Admin delete option
     if (isAdmin && !isOwner) {
       options.push({
         label: "Delete Group (Admin)",
@@ -151,7 +149,6 @@ const Group = () => {
             </div>
           </div>
           <div className="action">
-            {/* Group action buttons with improved logic */}
             <div className="action-buttons">
               {isOwner && (
                 <button className="edit-group-btn" onClick={handleOpenUpdateForm}>
@@ -159,7 +156,6 @@ const Group = () => {
                 </button>
               )}
               
-              {/* Join/Leave button for non-owners (including admins) */}
               {!isOwner && (
                 <button 
                   className="join-leave-btn" 
@@ -170,7 +166,6 @@ const Group = () => {
               )}
             </div>
             
-            {/* Admin options menu - positioned absolutely in top right */}
             {isAdmin && !isOwner && (
               <div className="more-options" ref={moreOptionsRef}>
                 <div onClick={toggleMenu}>

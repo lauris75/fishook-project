@@ -28,7 +28,7 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
     e.preventDefault();
     
     if (!content.trim() && !image) {
-      return; // Don't submit empty posts
+      return;
     }
     
     setIsSubmitting(true);
@@ -36,24 +36,19 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
     try {
       let finalImageUrl = null;
       
-      // Upload image to Firebase if there is one
       if (image) {
         const storageRef = ref(storage, `posts/${currentUser.id}/${uuidv4()}`);
         
-        // Create the file metadata
         const metadata = {
           contentType: image.type,
         };
         
-        // Upload file and metadata
         const uploadTask = uploadBytesResumable(storageRef, image, metadata);
         
-        // Listen for state changes, errors, and completion
         await new Promise((resolve, reject) => {
           uploadTask.on(
             'state_changed', 
             (snapshot) => {
-              // Update progress
               const progress = Math.round(
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100
               );
@@ -64,7 +59,6 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
               reject(error);
             },
             async () => {
-              // Upload completed, get download URL
               try {
                 finalImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
                 resolve();
@@ -77,11 +71,10 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
         });
       }
       
-      // Create post data
       const postData = {
         userId: currentUser.id,
         content: content,
-        photoURL: finalImageUrl, // Use the Firebase Storage URL
+        photoURL: finalImageUrl,
         date: new Date(),
         groupId: groupId || null
       };
@@ -89,13 +82,11 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
       const response = await api.post('/userPost', postData);
       
       if (response.status === 201) {
-        // Clear form after successful submission
         setContent("");
         setImage(null);
         setImageUrl("");
         setUploadProgress(0);
         
-        // Notify parent component that a new post was created
         if (onPostCreated) {
           onPostCreated(response.data);
         }
@@ -107,7 +98,6 @@ const PostForm = ({ onPostCreated, groupId, isOwnProfile = true }) => {
     }
   };
 
-  // Don't render the form if we're not on the user's own profile
   if (!isOwnProfile) {
     return null;
   }

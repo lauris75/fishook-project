@@ -21,24 +21,20 @@ const WeatherForecast = ({ latitude, longitude }) => {
   const [availableDates, setAvailableDates] = useState([]);
   const [availableTimes, setAvailableTimes] = useState([]);
   
-  // Format dates for display
   const formatDateForDisplay = (dateString) => {
     return format(new Date(dateString), 'EEE, MMM d');
   };
   
-  // Format times for display
   const formatTimeForDisplay = (dateTimeString) => {
     return format(new Date(dateTimeString), 'h:mm a');
   };
   
-  // Format wind direction as cardinal direction
   const getWindDirection = (degrees) => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     const index = Math.round(degrees / 22.5) % 16;
     return directions[index];
   };
 
-  // Fetch 5-day forecast data when component mounts
   useEffect(() => {
     if (!latitude || !longitude) return;
     
@@ -47,12 +43,10 @@ const WeatherForecast = ({ latitude, longitude }) => {
       setError(null);
       
       try {
-        // Fetch 5-day forecast with 3-hour intervals
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${OPENWEATHER_API_KEY}`
         );
         
-        // Process forecast data to extract unique dates and times
         const forecastData = response.data;
         const dateMap = new Map();
         
@@ -71,26 +65,21 @@ const WeatherForecast = ({ latitude, longitude }) => {
           });
         });
         
-        // Extract unique dates for the date dropdown
         const dates = Array.from(dateMap.keys());
         setAvailableDates(dates);
         
-        // Set default selected date to today/first available date
         if (dates.length > 0) {
           setSelectedDate(dates[0]);
           
-          // Set available times for the selected date
           const timesForSelectedDate = dateMap.get(dates[0]).map(item => ({
             time: item.time,
             fullDateTime: item.fullDateTime
           }));
           setAvailableTimes(timesForSelectedDate);
           
-          // Set default selected time to first available time
           if (timesForSelectedDate.length > 0) {
             setSelectedTime(timesForSelectedDate[0].fullDateTime);
             
-            // Find the forecast for selected date and time
             const selectedForecast = dateMap.get(dates[0]).find(
               item => item.fullDateTime === timesForSelectedDate[0].fullDateTime
             );
@@ -101,11 +90,10 @@ const WeatherForecast = ({ latitude, longitude }) => {
           }
         }
         
-        // Store the organized data for later use
         setForecast({
           dateMap: dateMap,
           city: forecastData.city,
-          current: forecastData.list[0] // First forecast item (closest to current time)
+          current: forecastData.list[0]
         });
         
       } catch (err) {
@@ -119,7 +107,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     fetchForecast();
   }, [latitude, longitude]);
   
-  // Update available times when selected date changes
   const handleDateChange = (e) => {
     const newSelectedDate = e.target.value;
     setSelectedDate(newSelectedDate);
@@ -132,11 +119,9 @@ const WeatherForecast = ({ latitude, longitude }) => {
       
       setAvailableTimes(timesForSelectedDate);
       
-      // Set default selected time to first available time for the new date
       if (timesForSelectedDate.length > 0) {
         setSelectedTime(timesForSelectedDate[0].fullDateTime);
         
-        // Find the forecast for selected date and time
         const selectedForecast = forecast.dateMap.get(newSelectedDate).find(
           item => item.fullDateTime === timesForSelectedDate[0].fullDateTime
         );
@@ -151,7 +136,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     }
   };
   
-  // Update displayed forecast when selected time changes
   const handleTimeChange = (e) => {
     const newSelectedTime = e.target.value;
     setSelectedTime(newSelectedTime);
@@ -159,7 +143,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     if (forecast && forecast.dateMap) {
       const selectedDateFromTime = newSelectedTime.split(' ')[0];
       
-      // Find the forecast for selected date and time
       const selectedForecast = forecast.dateMap.get(selectedDateFromTime).find(
         item => item.fullDateTime === newSelectedTime
       );
@@ -173,7 +156,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     }
   };
 
-  // Show loading state
   if (loading) {
     return (
       <div className="weather-forecast">
@@ -182,7 +164,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="weather-forecast">
@@ -191,7 +172,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     );
   }
 
-  // Show empty state if no forecast data
   if (!forecast || !forecast.current) {
     return (
       <div className="weather-forecast">
@@ -200,7 +180,6 @@ const WeatherForecast = ({ latitude, longitude }) => {
     );
   }
 
-  // Current forecast data
   const current = forecast.current;
   const weather = current.weather[0];
   const temp = Math.round(current.main.temp);

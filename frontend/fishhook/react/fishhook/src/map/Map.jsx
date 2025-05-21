@@ -8,7 +8,6 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import WeatherForecast from "../components/weatherForecast/WeatherForecast";
 
-// Fix for default marker icon in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
@@ -32,22 +31,17 @@ const Map = () => {
   const [markersLayer, setMarkersLayer] = useState(null);
   const [showWeather, setShowWeather] = useState(false);
 
-  // Lithuania's center coordinates
   const lithuaniaCenter = [55.1694, 23.8813];
   
-  // Initialize map
   useEffect(() => {
     if (!mapInstanceRef.current && mapRef.current) {
-      // Create map instance centered on Lithuania
       mapInstanceRef.current = L.map(mapRef.current).setView(lithuaniaCenter, 8);
       
-      // Add OpenStreetMap tile layer (free to use)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19,
       }).addTo(mapInstanceRef.current);
       
-      // Create a layer group for markers
       const markersLayerGroup = L.layerGroup().addTo(mapInstanceRef.current);
       setMarkersLayer(markersLayerGroup);
     }
@@ -60,23 +54,20 @@ const Map = () => {
     };
   }, []);
 
-  // Fetch all lakes data with progress tracking
   useEffect(() => {
     const fetchAllLakes = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Initial estimate of total lakes (will be refined as we fetch)
         let estimatedTotal = 100;
         setLoadingProgress({ current: 0, total: estimatedTotal });
         
         let allLakes = [];
         let offset = 0;
-        const limit = 50; // Fetch in batches of 50
+        const limit = 50;
         let hasMore = true;
         
-        // Continue fetching batches until we've got all lakes
         while (hasMore) {
           const response = await api.get("/lake", {
             params: { offset, limit }
@@ -85,24 +76,20 @@ const Map = () => {
           const batch = response.data;
           
           if (batch && batch.length > 0) {
-            // Add lakes to our collection
             allLakes = [...allLakes, ...batch];
             
-            // Update progress
             offset += batch.length;
             setLoadingProgress({ 
               current: allLakes.length, 
               total: Math.max(estimatedTotal, allLakes.length + (batch.length === limit ? limit : 0))
             });
             
-            // Determine if there are more lakes to fetch
             hasMore = batch.length === limit;
           } else {
             hasMore = false;
           }
         }
         
-        // Update final states
         setLakes(allLakes);
         setFilteredLakes(allLakes);
         setLoadingProgress({ current: allLakes.length, total: allLakes.length });
@@ -117,7 +104,6 @@ const Map = () => {
     fetchAllLakes();
   }, []);
 
-  // Filter lakes based on search
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
@@ -134,30 +120,22 @@ const Map = () => {
     }
   }, [searchQuery, lakes]);
 
-  // Update markers when filtered lakes change
   useEffect(() => {
     if (markersLayer && filteredLakes.length > 0) {
-      // Clear existing markers
       markersLayer.clearLayers();
       
-      // Add markers for each lake
       filteredLakes.forEach(lake => {
         try {
-          // Convert string coordinates to numbers
           const lat = parseFloat(lake.latitude);
           const lng = parseFloat(lake.longitude);
           
           if (!isNaN(lat) && !isNaN(lng)) {
-            // Create marker with fishing icon
             const marker = L.marker([lat, lng]).addTo(markersLayer);
             
-            // Add click handler to show side panel
             marker.on('click', () => {
               setActiveLocation(lake);
-              // Reset weather visibility when a new lake is selected
               setShowWeather(false);
               
-              // Pan map to center on the clicked marker
               if (mapInstanceRef.current) {
                 mapInstanceRef.current.panTo([lat, lng]);
               }
@@ -170,7 +148,6 @@ const Map = () => {
     }
   }, [filteredLakes, markersLayer]);
 
-  // Toggle weather forecast display
   const toggleWeather = () => {
     setShowWeather(!showWeather);
   };

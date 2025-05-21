@@ -16,7 +16,6 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   
-  // Check if we're viewing our own profile
   const userId = id ? parseInt(id) : currentUser.id;
   const isOwnProfile = userId === currentUser.id;
   
@@ -83,16 +82,12 @@ const Profile = () => {
   };
 
   const handleProfileUpdate = (updatedProfile) => {
-    // Update the profile state with the new data
     setProfile({
       ...profile,
       ...updatedProfile
     });
 
-    // If it's the current user's profile, also update the currentUser in context
     if (isOwnProfile) {
-      // We're only updating the AuthContext user via localStorage update
-      // The context provider will pick up the change on next page load
       const updatedUser = {
         ...currentUser,
         ...updatedProfile
