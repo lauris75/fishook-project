@@ -15,9 +15,10 @@ import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
-  Navigate
+  Navigate,
+  useLocation
 } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/AuthContext";
 import TopBar from "./components/topBar/TopBar.jsx";
 import NavBar from "./components/navBar/NavBar.jsx";
@@ -42,11 +43,28 @@ function App() {
   }
 
   const ProtectedRoute = ({children}) => {
-    if(!currentUser){
-      return <Navigate to="/login"/>
+    const location = useLocation();
+    
+    useEffect(() => {
+      if (!currentUser) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    }, [location.pathname, currentUser]);
+
+    if (!currentUser) {
+      return <Navigate to="/login" replace />;
     }
+    
     return children;
   }
+
+  const ProtectRoute = ({ element }) => {
+    if (!currentUser) {
+      return <Navigate to="/login" replace />;
+    }
+    return element;
+  };
 
   const router = createBrowserRouter([
     {
@@ -57,55 +75,55 @@ function App() {
       children: [
         {
           path:"/",
-          element:<Home/>
+          element: <ProtectRoute element={<Home/>} />
         },
         {
           path:"/profile/:id",
-          element:<Profile/>
+          element: <ProtectRoute element={<Profile/>} />
         },
         {
           path:"/group",
-          element:<Groups/>
+          element: <ProtectRoute element={<Groups/>} />
         },
         {
           path:"/group/:id",
-          element:<Group/>
+          element: <ProtectRoute element={<Group/>} />
         },
         {
           path:"/marketplace",
-          element:<Marketplace/>
+          element: <ProtectRoute element={<Marketplace/>} />
         },
         {
           path:"/chat",
-          element:<Chat/>
+          element: <ProtectRoute element={<Chat/>} />
         },
         {
           path:"/map",
-          element:<Map/>
+          element: <ProtectRoute element={<Map/>} />
         },
         {
           path:"/fish",
-          element:<Fish/>
+          element: <ProtectRoute element={<Fish/>} />
         },
         {
           path:"/fish/:id",
-          element:<Fish/>
+          element: <ProtectRoute element={<Fish/>} />
         },
         {
           path:"/lake",
-          element:<Lake/>
+          element: <ProtectRoute element={<Lake/>} />
         },
         {
           path:"/lake/:id",
-          element:<Lake/>
+          element: <ProtectRoute element={<Lake/>} />
         },
         {
           path:"/usefulinfo",
-          element:<UsefulInfo/>
+          element: <ProtectRoute element={<UsefulInfo/>} />
         },
         {
           path:"/usefulinfo/:id",
-          element:<UsefulInfo/>
+          element: <ProtectRoute element={<UsefulInfo/>} />
         }
       ]
     },
