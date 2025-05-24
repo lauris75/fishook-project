@@ -1,5 +1,6 @@
 import React from 'react';
 import "./InfoCard.scss";
+import { formatDecimal } from '../../utils/formatters';
 
 const InfoCard = ({ image, title, name, summary, description, coords, area, coastlineLength }) => {
   return (
@@ -18,8 +19,8 @@ const InfoCard = ({ image, title, name, summary, description, coords, area, coas
           <div className="info-coords">
             <span>Latitude: {coords.latitude}</span>
             <span>Longitude: {coords.longitude}</span>
-            {area && <span>Area: {area} sq ha</span>}
-            {coastlineLength && <span>Coastline: {coastlineLength} km</span>}
+            {area && <span>Area: {formatDecimal(area)} sq ha</span>}
+            {coastlineLength && <span>Coastline: {formatDecimal(coastlineLength)} km</span>}
           </div>
         )}
       </div>

@@ -6,6 +6,7 @@ import InfoCard from "../components/infoCard/InfoCard";
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import FishEditButton from "../components/fishEditButton/FishEditButton";
 import FishLakeManager from "../components/fishLakeManager/FishLakeManager";
+import { formatDecimal } from "../utils/formatters";
 import "./Fish.scss";
 
 const Fish = () => {
@@ -163,6 +164,8 @@ const Fish = () => {
                     <p>{lake.summary.substring(0, 100)}...</p>
                     <div className="lake-coords">
                       <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
+                      {lake.area && <span> • Area: {formatDecimal(lake.area)} sq ha</span>}
+                      {lake.coastlineLength && <span> • Coastline: {formatDecimal(lake.coastlineLength)} km</span>}
                     </div>
                   </div>
                 </div>

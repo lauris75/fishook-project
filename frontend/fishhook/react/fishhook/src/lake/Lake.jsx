@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import LakeEditButton from "../components/lakeEditButton/LakeEditButton";
 import LakeFishManager from "../components/lakeFishManager/LakeFishManager";
+import { formatDecimal } from "../utils/formatters";
 import "./Lake.scss";
 
 const Lake = () => {
@@ -393,8 +394,8 @@ const Lake = () => {
                 <p>{lake.summary.substring(0, 100)}...</p>
                 <div className="lake-coords">
                   <span>Lat: {lake.latitude}</span> • <span>Long: {lake.longitude}</span>
-                  {lake.area && <span> • Area: {lake.area} sq ha</span>}
-                  {lake.coastlineLength && <span> • Coastline: {lake.coastlineLength} km</span>}
+                  {lake.area && <span> • Area: {formatDecimal(lake.area)} sq ha</span>}
+                  {lake.coastlineLength && <span> • Coastline: {formatDecimal(lake.coastlineLength)} km</span>}
                 </div>
               </div>
             </div>

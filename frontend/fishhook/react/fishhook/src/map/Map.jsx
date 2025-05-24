@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import WeatherForecast from "../components/weatherForecast/WeatherForecast";
+import { formatDecimal } from "../utils/formatters";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -273,10 +274,9 @@ const Map = () => {
                 <div className="lake-coords">
                   <div>Latitude: {activeLocation.latitude}</div>
                   <div>Longitude: {activeLocation.longitude}</div>
-                  {activeLocation.area && <div>Area: {activeLocation.area} sq ha</div>}
-                  {activeLocation.coastlineLength && <div>Coastline: {activeLocation.coastlineLength} km</div>}
+                  {activeLocation.area && <div>Area: {formatDecimal(activeLocation.area)} sq ha</div>}
+                  {activeLocation.coastlineLength && <div>Coastline: {formatDecimal(activeLocation.coastlineLength)} km</div>}
                 </div>
-                
                 <div className="panel-actions">
                   <button 
                     className={`weather-toggle-btn ${showWeather ? 'active' : ''}`}
