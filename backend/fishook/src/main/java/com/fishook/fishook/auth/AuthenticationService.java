@@ -117,12 +117,12 @@ public class AuthenticationService {
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
-                    "Invalid password. Please check your password and try again."
+                    "Invalid password"
             );
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
-                    "Authentication failed. Please check your credentials."
+                    "Authentication failed"
             );
         }
     }

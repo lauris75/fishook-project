@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAuthenticationException(AuthenticationException ex) {
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication failed. Please check your credentials.",
+                "Authentication failed",
                 "AUTHENTICATION_FAILED"
         );
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);

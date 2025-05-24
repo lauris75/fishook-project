@@ -25,7 +25,7 @@ const Login = () => {
   
   const getErrorMessage = (errorResponse) => {
     if (errorResponse?.status === 401) {
-      return "Invalid email or password. Please check your credentials and try again.";
+      return "Invalid email or password";
     }
     
     if (errorResponse?.status === 403) {
@@ -33,11 +33,11 @@ const Login = () => {
     }
     
     if (errorResponse?.status === 404) {
-      return "User not found. Please check your email address or register for a new account.";
+      return "User with this email was not found";
     }
     
     if (errorResponse?.status === 400) {
-      return errorResponse?.message || "Please check your email and password.";
+      return errorResponse?.message;
     }
     
     if (errorResponse?.status >= 500) {
@@ -135,7 +135,7 @@ const Login = () => {
               </div>
             )}
             <button type="submit" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Logging in" : "Login"}
             </button>
           </form>
         </div>
