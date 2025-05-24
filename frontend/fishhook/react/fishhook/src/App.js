@@ -18,14 +18,14 @@ import {
   Navigate,
   useLocation
 } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import TopBar from "./components/topBar/TopBar.jsx";
 import NavBar from "./components/navBar/NavBar.jsx";
 import RightBar from "./components/rightBar/RightBar.jsx";
 
 function App() {
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const Layout = () => {
     return(
@@ -34,7 +34,7 @@ function App() {
         <div style={{display: "flex"}}>
           <NavBar/>
           <div style={{flex: 6}}>
-          <Outlet/>
+            <Outlet/>
           </div>
           <RightBar/>
         </div>
@@ -42,88 +42,76 @@ function App() {
     )
   }
 
-  const ProtectedRoute = ({children}) => {
+  const ProtectedRoute = ({ children }) => {
     const location = useLocation();
-    
-    useEffect(() => {
-      if (!currentUser) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
-    }, [location.pathname, currentUser]);
 
     if (!currentUser) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/login" state={{ from: location }} replace />;
     }
     
     return children;
   }
 
-  const ProtectRoute = ({ element }) => {
-    if (!currentUser) {
-      return <Navigate to="/login" replace />;
-    }
-    return element;
-  };
-
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <ProtectedRoute>
-               <Layout/>
-               </ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          <Layout/>
+        </ProtectedRoute>
+      ),
       children: [
         {
-          path:"/",
-          element: <ProtectRoute element={<Home/>} />
+          path: "/",
+          element: <Home/>
         },
         {
-          path:"/profile/:id",
-          element: <ProtectRoute element={<Profile/>} />
+          path: "/profile/:id",
+          element: <Profile/>
         },
         {
-          path:"/group",
-          element: <ProtectRoute element={<Groups/>} />
+          path: "/group",
+          element: <Groups/>
         },
         {
-          path:"/group/:id",
-          element: <ProtectRoute element={<Group/>} />
+          path: "/group/:id",
+          element: <Group/>
         },
         {
-          path:"/marketplace",
-          element: <ProtectRoute element={<Marketplace/>} />
+          path: "/marketplace",
+          element: <Marketplace/>
         },
         {
-          path:"/chat",
-          element: <ProtectRoute element={<Chat/>} />
+          path: "/chat",
+          element: <Chat/>
         },
         {
-          path:"/map",
-          element: <ProtectRoute element={<Map/>} />
+          path: "/map",
+          element: <Map/>
         },
         {
-          path:"/fish",
-          element: <ProtectRoute element={<Fish/>} />
+          path: "/fish",
+          element: <Fish/>
         },
         {
-          path:"/fish/:id",
-          element: <ProtectRoute element={<Fish/>} />
+          path: "/fish/:id",
+          element: <Fish/>
         },
         {
-          path:"/lake",
-          element: <ProtectRoute element={<Lake/>} />
+          path: "/lake",
+          element: <Lake/>
         },
         {
-          path:"/lake/:id",
-          element: <ProtectRoute element={<Lake/>} />
+          path: "/lake/:id",
+          element: <Lake/>
         },
         {
-          path:"/usefulinfo",
-          element: <ProtectRoute element={<UsefulInfo/>} />
+          path: "/usefulinfo",
+          element: <UsefulInfo/>
         },
         {
-          path:"/usefulinfo/:id",
-          element: <ProtectRoute element={<UsefulInfo/>} />
+          path: "/usefulinfo/:id",
+          element: <UsefulInfo/>
         }
       ]
     },
