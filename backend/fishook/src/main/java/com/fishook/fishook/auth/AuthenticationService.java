@@ -7,10 +7,14 @@ import com.fishook.fishook.entity.UserEntity;
 import com.fishook.fishook.exception.UserAlreadyExistsException;
 import com.fishook.fishook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -76,28 +80,50 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        try {
+            Optional<UserEntity> userOptional = userRepository.findByEmail(request.getEmail());
+            if (!userOptional.isPresent()) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No account found with this email address"
+                );
+            }
 
-        UserDto userDto = new UserDto(
-                userEntity.getId(),
-                userEntity.getName(),
-                userEntity.getLastname(),
-                userEntity.getEmail(),
-                userEntity.getProfilePicture(),
-                userEntity.getDateOfBirth(),
-                userEntity.getRole().toString()
-        );
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
 
-        String jwtToken = jwtService.generatetoken(userEntity);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .user(userDto)
-                .build();
+            UserEntity userEntity = userOptional.get();
+
+            UserDto userDto = new UserDto(
+                    userEntity.getId(),
+                    userEntity.getName(),
+                    userEntity.getLastname(),
+                    userEntity.getEmail(),
+                    userEntity.getProfilePicture(),
+                    userEntity.getDateOfBirth(),
+                    userEntity.getRole().toString()
+            );
+
+            String jwtToken = jwtService.generatetoken(userEntity);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .user(userDto)
+                    .build();
+
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid password. Please check your password and try again."
+            );
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication failed. Please check your credentials."
+            );
+        }
     }
 }

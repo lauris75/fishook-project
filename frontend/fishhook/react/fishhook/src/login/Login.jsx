@@ -14,21 +14,62 @@ const Login = () => {
   });
   
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (error) {
+      setError(null);
+    }
+  };
+  
+  const getErrorMessage = (errorResponse) => {
+    if (errorResponse?.status === 401) {
+      return "Invalid email or password. Please check your credentials and try again.";
+    }
+    
+    if (errorResponse?.status === 403) {
+      return "Your account has been suspended. Please contact support.";
+    }
+    
+    if (errorResponse?.status === 404) {
+      return "User not found. Please check your email address or register for a new account.";
+    }
+    
+    if (errorResponse?.status === 400) {
+      return errorResponse?.message || "Please check your email and password.";
+    }
+    
+    if (errorResponse?.status >= 500) {
+      return "Server error. Please try again later.";
+    }
+    
+    if (!errorResponse?.status) {
+      return "Unable to connect to the server. Please check your internet connection.";
+    }
+    
+    return errorResponse?.message || "Login failed. Please try again.";
   };
   
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
         
     if (!inputs.email || !inputs.password) {
       setError({
-        status: 400,
-        message: "Email and password are required",
-        errorCode: "MISSING_FIELDS"
+        message: "Email and password are required"
       });
+      setIsLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inputs.email)) {
+      setError({
+        message: "Please enter a valid email address"
+      });
+      setIsLoading(false);
       return;
     }
         
@@ -38,18 +79,29 @@ const Login = () => {
       if (response.data && response.data.token) {
         login(response.data.user, response.data.token);
         navigate("/");
-      }
-    } catch (err) {
-      if (err.response && err.response.data) {
-        setError(err.response.data);
-        console.log("Login error:", err.response.data);
       } else {
         setError({
-          status: 500,
-          message: "An unexpected error occurred",
-          errorCode: "UNKNOWN_ERROR"
+          message: "Invalid response from server. Please try again."
         });
       }
+    } catch (err) {
+      console.error("Login error:", err);
+      
+      let errorMessage = "An unexpected error occurred";
+      
+      if (err.response?.data) {
+        errorMessage = getErrorMessage(err.response.data);
+      } else if (err.request) {
+        errorMessage = "Unable to connect to the server. Please check your internet connection and try again.";
+      } else {
+        errorMessage = "An unexpected error occurred. Please try again.";
+      }
+      
+      setError({
+        message: errorMessage
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,20 +115,28 @@ const Login = () => {
               type="email" 
               placeholder="Email" 
               name="email" 
+              value={inputs.email}
               onChange={handleChange}
+              disabled={isLoading}
+              autoComplete="email"
             />
             <input 
               type="password" 
               placeholder="Password" 
               name="password" 
+              value={inputs.password}
               onChange={handleChange}
+              disabled={isLoading}
+              autoComplete="current-password"
             />
             {error && (
               <div className="error-container">
                 <div className="error-message">{error.message}</div>
               </div>
             )}
-            <button type="submit">Login</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
           </form>
         </div>
         <div className="right">
