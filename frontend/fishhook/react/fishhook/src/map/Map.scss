@@ -94,6 +94,12 @@
         height: calc(100vh - 240px);
         min-height: 500px;
         width: 100%;
+        
+        /* Fix for Leaflet in React */
+        .leaflet-container {
+          height: 100%;
+          width: 100%;
+        }
       }
       
       .lake-details-panel {
@@ -232,34 +238,6 @@
           }
         }
       }
-    }
-  }
-}
-
-.lake-popup {
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 16px;
-    color: #333;
-  }
-  
-  p {
-    margin: 0 0 8px 0;
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .view-lake-btn {
-    display: inline-block;
-    background-color: #5F9EA0;
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    font-size: 14px;
-    
-    &:hover {
-      background-color: darken(#5F9EA0, 10%);
     }
   }
 }

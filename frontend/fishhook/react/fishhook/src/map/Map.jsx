@@ -3,15 +3,14 @@ import { api } from "../context/AuthContext";
 import './Map.scss';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import SearchFilter from "../components/searchFilter/SearchFilter";
 import WeatherForecast from "../components/weatherForecast/WeatherForecast";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -35,11 +34,17 @@ const Map = () => {
   
   useEffect(() => {
     if (!mapInstanceRef.current && mapRef.current) {
-      mapInstanceRef.current = L.map(mapRef.current).setView(lithuaniaCenter, 8);
+      mapInstanceRef.current = L.map(mapRef.current, {
+        center: lithuaniaCenter,
+        zoom: 8,
+        zoomControl: true,
+        attributionControl: true
+      });
       
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
+        minZoom: 6
       }).addTo(mapInstanceRef.current);
       
       const markersLayerGroup = L.layerGroup().addTo(mapInstanceRef.current);
@@ -50,6 +55,7 @@ const Map = () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
+        setMarkersLayer(null);
       }
     };
   }, []);
@@ -121,35 +127,88 @@ const Map = () => {
   }, [searchQuery, lakes]);
 
   useEffect(() => {
-    if (markersLayer && filteredLakes.length > 0) {
+    if (markersLayer && filteredLakes.length > 0 && mapInstanceRef.current) {
       markersLayer.clearLayers();
       
-      filteredLakes.forEach(lake => {
+      let successfulMarkers = 0;
+      let failedMarkers = 0;
+      
+      filteredLakes.forEach((lake, index) => {
         try {
           const lat = parseFloat(lake.latitude);
           const lng = parseFloat(lake.longitude);
           
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const marker = L.marker([lat, lng]).addTo(markersLayer);
-            
-            marker.on('click', () => {
-              setActiveLocation(lake);
-              setShowWeather(false);
-              
-              if (mapInstanceRef.current) {
-                mapInstanceRef.current.panTo([lat, lng]);
-              }
-            });
+          if (isNaN(lat) || isNaN(lng)) {
+            console.warn(`Invalid coordinates for lake ${lake.name}: lat=${lake.latitude}, lng=${lake.longitude}`);
+            failedMarkers++;
+            return;
           }
+          
+          if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            console.warn(`Coordinates out of bounds for lake ${lake.name}: lat=${lat}, lng=${lng}`);
+            failedMarkers++;
+            return;
+          }
+          
+          const marker = L.marker([lat, lng], {
+            title: lake.name
+          });
+          
+
+          
+          marker.on('click', (e) => {
+            setActiveLocation(lake);
+            setShowWeather(false);
+            
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.panTo([lat, lng]);
+            }
+          });
+          
+          marker.addTo(markersLayer);
+          successfulMarkers++;
+          
         } catch (error) {
           console.error(`Error adding marker for lake ${lake.name}:`, error);
+          failedMarkers++;
         }
       });
+      
+      if (successfulMarkers > 0 && filteredLakes.length <= 50) {
+        try {
+          const group = new L.featureGroup(markersLayer.getLayers());
+          if (group.getBounds().isValid()) {
+            mapInstanceRef.current.fitBounds(group.getBounds(), { padding: [20, 20] });
+          }
+        } catch (error) {
+          console.warn('Could not fit bounds to markers:', error);
+        }
+      }
+    } else if (markersLayer) {
+      markersLayer.clearLayers();
     }
   }, [filteredLakes, markersLayer]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        setTimeout(() => {
+          mapInstanceRef.current.invalidateSize();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const toggleWeather = () => {
     setShowWeather(!showWeather);
+  };
+
+  const closeLocationPanel = () => {
+    setActiveLocation(null);
+    setShowWeather(false);
   };
 
   return (
@@ -199,7 +258,7 @@ const Map = () => {
             <div className="lake-details-panel">
               <div className="panel-header">
                 <h2>{activeLocation.name}</h2>
-                <button className="close-panel" onClick={() => setActiveLocation(null)}>×</button>
+                <button className="close-panel" onClick={closeLocationPanel}>×</button>
               </div>
               
               <div className="panel-content">
