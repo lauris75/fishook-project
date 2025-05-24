@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import { api } from "../../context/AuthContext";
 import { AuthContext } from "../../context/AuthContext";
 
-const Posts = ({ userId, groupId }) => {
+const Posts = ({ userId, groupId, showAllPosts = false }) => {
   const { currentUser } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,9 +21,11 @@ const Posts = ({ userId, groupId }) => {
         if (userId) {
           endpoint = `/userPost/userPosts/${userId}`;
         }
-        
-        if (groupId) {
+        else if (groupId) {
           endpoint = `/userPost/groupPosts/${groupId}`;
+        }
+        else if (showAllPosts) {
+          endpoint = '/userPost/all';
         }
         
         const response = await api.get(endpoint);
@@ -36,7 +38,7 @@ const Posts = ({ userId, groupId }) => {
     };
 
     fetchPosts();
-  }, [userId, groupId, currentUser.id]);
+  }, [userId, groupId, currentUser.id, showAllPosts]);
 
   const handlePostCreated = (newPost) => {
     setPosts(prevPosts => [newPost, ...prevPosts]);

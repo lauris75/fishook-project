@@ -54,6 +54,12 @@ public class UserPostController {
     }
 
     @GetMapping
+    public List<PostDto> getHomePagePosts() {
+        Long currentUserId = securityService.getCurrentUserId();
+        return userPostService.getHomePagePosts(currentUserId);
+    }
+
+    @GetMapping("/all")
     public List<PostDto> getAllUserFullPosts() {
         Long currentUserId = securityService.getCurrentUserId();
         return userPostService.getAllUserFullPosts(currentUserId);

@@ -10,6 +10,8 @@ public interface UserPostService {
 
     List<PostDto> getAllUserFullPosts(Long userId);
 
+    List<PostDto> getHomePagePosts(Long currentUserId);
+
     List<PostDto> getAllUserPostsByUserId(Long userId, Long currentUserId);
 
     List<PostDto> getAllUserPostsForGroup(Long groupId, Long currentUserId);

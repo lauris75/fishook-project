@@ -99,7 +99,7 @@ const TopBar = () => {
   return (
     <div className="topBar">
       <div className="left">
-        <Link to="/" style={{textDecoration:"none"}}>Fishhook<PhishingIcon style={{ fontSize: 40 }}/></Link>
+        <Link to="/" style={{textDecoration:"none"}}>Fishook<PhishingIcon style={{ fontSize: 40 }}/></Link>
       </div>
       <div className="center" ref={searchContainerRef}>
         <div className="search-container">

@@ -73,11 +73,11 @@ const Register = () => {
     <div className="register">
       <div className="card">
         <div className="left">
-          <p>Welcome to our Fishermen Social, the ultimate online community 
+          <p>Welcome to Fishook, the ultimate online community 
             for passionate anglers and fishing enthusiasts. 
             Whether you're an experienced angler or just starting out, 
             this app is designed to connect you with a vibrant community of fellow fishermen from around the world.</p>
-          <p>At Fishermen Social, we understand the thrill of the catch, 
+          <p>At Fishook, we understand the thrill of the catch, 
             the joy of being out on the water, and the stories that come with 
             every fishing adventure. Our app provides a platform where you can 
             share your fishing experiences, exchange tips and techniques, showcase your 

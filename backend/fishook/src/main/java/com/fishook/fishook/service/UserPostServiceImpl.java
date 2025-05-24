@@ -12,6 +12,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,16 +22,22 @@ public class UserPostServiceImpl implements UserPostService {
     private final PostLikesService postLikesService;
     private final UserService userService;
     private final PostCommentService postCommentService;
+    private final FollowingService followingService;
+    private final GroupMemberService groupMemberService;
 
     public UserPostServiceImpl(
             UserPostRepository userPostRepository,
             PostLikesService postLikesService,
             UserService userService,
-            PostCommentService postCommentService) {
+            PostCommentService postCommentService,
+            FollowingService followingService,
+            GroupMemberService groupMemberService) {
         this.userPostRepository = userPostRepository;
         this.postLikesService = postLikesService;
         this.userService = userService;
         this.postCommentService = postCommentService;
+        this.followingService = followingService;
+        this.groupMemberService = groupMemberService;
     }
 
     @Override
@@ -42,6 +49,36 @@ public class UserPostServiceImpl implements UserPostService {
     public List<PostDto> getAllUserFullPosts(Long userId) {
         List<UserPost> allPosts = userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
         return enrichPostsWithAssociatedData(allPosts, userId);
+    }
+
+    @Override
+    public List<PostDto> getHomePagePosts(Long currentUserId) {
+        List<UserPost> allPosts = userPostRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
+
+        Set<Long> followedUserIds = followingService.getAllFollowing(currentUserId)
+                .stream()
+                .map(following -> following.getFollowee())
+                .collect(Collectors.toSet());
+
+        Set<Long> userGroupIds = groupMemberService.getAllGroupsMembers()
+                .stream()
+                .filter(member -> member.getUserId().equals(currentUserId))
+                .map(member -> member.getGroupId())
+                .collect(Collectors.toSet());
+
+        List<UserPost> filteredPosts = allPosts.stream()
+                .filter(post ->
+                        post.getUserId().equals(currentUserId) ||
+                                followedUserIds.contains(post.getUserId()) ||
+                                (post.getGroupId() != null && userGroupIds.contains(post.getGroupId()))
+                )
+                .collect(Collectors.toList());
+
+        if (filteredPosts.size() < 10) {
+            return enrichPostsWithAssociatedData(allPosts, currentUserId);
+        }
+
+        return enrichPostsWithAssociatedData(filteredPosts, currentUserId);
     }
 
     @Override
