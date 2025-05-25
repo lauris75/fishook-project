@@ -63,15 +63,24 @@
         }
         
         .fish-image {
-          height: 180px;
+          height: 220px;
           width: 100%;
           overflow: hidden;
+          background-color: #f8f9fa;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           
           img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: center;
             transition: transform 0.3s ease;
+            
+            &:hover {
+              transform: scale(1.05);
+            }
           }
         }
         
